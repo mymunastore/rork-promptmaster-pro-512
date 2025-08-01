@@ -110,10 +110,12 @@ export const usePerformance = (
       func: T,
       delay: number
     ): ((...args: Parameters<T>) => void) => {
-      const timeoutRef = useRef<NodeJS.Timeout>();
+      const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
       return (...args: Parameters<T>) => {
-        clearTimeout(timeoutRef.current);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
         timeoutRef.current = setTimeout(() => func(...args), delay);
       };
     },
