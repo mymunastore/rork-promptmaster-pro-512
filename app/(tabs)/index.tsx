@@ -60,18 +60,20 @@ export default function HomeScreen() {
       marginBottom: layout.spacing.md,
     },
     heroTitle: {
-      fontSize: 32,
-      fontWeight: '800' as const,
+      fontSize: layout.typography.sizes.largeTitle,
+      fontWeight: layout.typography.weights.heavy,
       color: theme.text,
       textAlign: 'center',
       marginBottom: layout.spacing.sm,
+      letterSpacing: -0.5,
     },
     heroSubtitle: {
-      fontSize: 16,
+      fontSize: layout.typography.sizes.callout,
       color: theme.textSecondary,
       textAlign: 'center',
       marginBottom: layout.spacing.xl,
-      lineHeight: 24,
+      lineHeight: 22,
+      letterSpacing: -0.2,
     },
     heroButtons: {
       flexDirection: 'row',
@@ -93,11 +95,12 @@ export default function HomeScreen() {
       marginBottom: layout.spacing.lg,
     },
     sectionTitle: {
-      fontSize: 24,
-      fontWeight: '700' as const,
+      fontSize: layout.typography.sizes.title2,
+      fontWeight: layout.typography.weights.bold,
       color: theme.text,
       marginBottom: layout.spacing.lg,
       textAlign: 'center',
+      letterSpacing: -0.3,
     },
     featuresGrid: {
       flexDirection: 'row',
@@ -123,17 +126,19 @@ export default function HomeScreen() {
       marginBottom: layout.spacing.md,
     },
     featureTitle: {
-      fontSize: 16,
-      fontWeight: '700' as const,
+      fontSize: layout.typography.sizes.callout,
+      fontWeight: layout.typography.weights.semibold,
       color: theme.text,
       marginBottom: layout.spacing.sm,
       textAlign: 'center',
+      letterSpacing: -0.2,
     },
     featureDescription: {
-      fontSize: 13,
+      fontSize: layout.typography.sizes.footnote,
       color: theme.textSecondary,
       textAlign: 'center',
       lineHeight: 18,
+      letterSpacing: -0.1,
     },
     templatesSection: {
       paddingHorizontal: layout.spacing.lg,
@@ -149,9 +154,10 @@ export default function HomeScreen() {
       marginBottom: layout.spacing.lg,
     },
     viewAllText: {
-      fontSize: 14,
-      color: theme.accent1,
-      fontWeight: '600' as const,
+      fontSize: layout.typography.sizes.subheadline,
+      color: theme.primary,
+      fontWeight: layout.typography.weights.semibold,
+      letterSpacing: -0.1,
     },
     templatesList: {
       marginTop: layout.spacing.sm,
@@ -167,16 +173,18 @@ export default function HomeScreen() {
       borderStyle: 'dashed',
     },
     createNewText: {
-      fontSize: 16,
-      fontWeight: '600' as const,
+      fontSize: layout.typography.sizes.callout,
+      fontWeight: layout.typography.weights.semibold,
       color: theme.text,
       marginTop: layout.spacing.md,
       marginBottom: layout.spacing.xs,
+      letterSpacing: -0.2,
     },
     createNewDescription: {
-      fontSize: 14,
+      fontSize: layout.typography.sizes.footnote,
       color: theme.textSecondary,
       textAlign: 'center',
+      letterSpacing: -0.1,
     },
   });
 
@@ -190,7 +198,7 @@ export default function HomeScreen() {
       >
         <View style={styles.heroSection}>
           <View style={styles.heroContent}>
-            <Wand2 size={48} color={theme.accent1} style={styles.heroIcon} />
+            <Wand2 size={48} color={theme.primary} style={styles.heroIcon} />
             <Text style={styles.heroTitle}>AI Prompt Studio</Text>
             <Text style={styles.heroSubtitle}>
               Create world-class AI prompts with professional templates, smart optimization, and advanced features
@@ -217,7 +225,7 @@ export default function HomeScreen() {
         <View style={styles.featuresSection}>
           <Text style={styles.sectionTitle}>Powerful Features</Text>
           <View style={styles.featuresGrid}>
-            <Card style={styles.featureCard}>
+            <Card variant="elevated" style={styles.featureCard}>
               <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '20' }]}>
                 <Brain size={28} color={theme.accent1} />
               </View>
@@ -227,7 +235,7 @@ export default function HomeScreen() {
               </Text>
             </Card>
             
-            <Card style={styles.featureCard}>
+            <Card variant="elevated" style={styles.featureCard}>
               <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '20' }]}>
                 <Rocket size={28} color={theme.accent2} />
               </View>
@@ -237,7 +245,7 @@ export default function HomeScreen() {
               </Text>
             </Card>
             
-            <Card style={styles.featureCard}>
+            <Card variant="elevated" style={styles.featureCard}>
               <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '20' }]}>
                 <Sparkles size={28} color={theme.accent3} />
               </View>
@@ -247,7 +255,7 @@ export default function HomeScreen() {
               </Text>
             </Card>
             
-            <Card style={styles.featureCard}>
+            <Card variant="elevated" style={styles.featureCard}>
               <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '20' }]}>
                 <BookOpen size={28} color={theme.accent4} />
               </View>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, ViewStyle, TextStyle, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import layout from '@/constants/layout';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,7 +7,7 @@ import { useTheme } from '@/hooks/useTheme';
 interface ButtonProps {
   title: string;
   onPress: () => void | Promise<void>;
-  variant?: 'primary' | 'secondary' | 'outline' | 'text';
+  variant?: 'primary' | 'secondary' | 'outline' | 'text' | 'destructive';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
@@ -15,6 +15,7 @@ interface ButtonProps {
   textStyle?: TextStyle;
   testID?: string;
   icon?: React.ReactElement;
+  hapticFeedback?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -28,38 +29,48 @@ const Button: React.FC<ButtonProps> = ({
   textStyle,
   testID,
   icon,
+  hapticFeedback = true,
 }) => {
   const { theme } = useTheme();
   
+  const handlePress = async () => {
+    if (hapticFeedback && Platform.OS !== 'web') {
+      const { Haptics } = await import('expo-haptics');
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    onPress();
+  };
+
   const styles = StyleSheet.create({
     buttonContainer: {
-      borderRadius: layout.borderRadius.md,
+      borderRadius: layout.borderRadius.lg,
       overflow: 'hidden',
+      ...layout.shadows.small,
     },
     button: {
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
-      borderRadius: layout.borderRadius.md,
+      borderRadius: layout.borderRadius.lg,
       flexDirection: 'row' as const,
     },
     smallButton: {
-      paddingVertical: layout.spacing.xs,
+      paddingVertical: layout.spacing.xs + 2,
       paddingHorizontal: layout.spacing.md,
-      minHeight: 32,
+      minHeight: 36,
     },
     mediumButton: {
-      paddingVertical: layout.spacing.sm,
+      paddingVertical: layout.spacing.sm + 2,
       paddingHorizontal: layout.spacing.lg,
       minHeight: 44,
     },
     largeButton: {
       paddingVertical: layout.spacing.md,
       paddingHorizontal: layout.spacing.xl,
-      minHeight: 52,
+      minHeight: 50,
     },
     outlineButton: {
       backgroundColor: 'transparent',
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: theme.primary,
     },
     textButton: {
@@ -67,22 +78,26 @@ const Button: React.FC<ButtonProps> = ({
       paddingHorizontal: layout.spacing.xs,
       minHeight: 'auto' as const,
     },
+    destructiveButton: {
+      backgroundColor: theme.error,
+    },
     disabledButton: {
-      opacity: 0.6,
+      opacity: 0.4,
     },
     text: {
-      color: theme.background,
-      fontWeight: '600' as const,
+      color: '#FFFFFF',
+      fontWeight: layout.typography.weights.semibold,
       textAlign: 'center' as const,
+      letterSpacing: -0.2,
     },
     smallText: {
-      fontSize: 12,
+      fontSize: layout.typography.sizes.footnote,
     },
     mediumText: {
-      fontSize: 14,
+      fontSize: layout.typography.sizes.callout,
     },
     largeText: {
-      fontSize: 16,
+      fontSize: layout.typography.sizes.headline,
     },
     outlineText: {
       color: theme.primary,
@@ -90,14 +105,17 @@ const Button: React.FC<ButtonProps> = ({
     textVariantText: {
       color: theme.primary,
     },
+    destructiveText: {
+      color: '#FFFFFF',
+    },
     disabledText: {
       color: theme.textSecondary,
     },
     textWithIcon: {
-      marginLeft: 8,
+      marginLeft: layout.spacing.xs,
     },
     iconOnlyButton: {
-      paddingHorizontal: 12,
+      paddingHorizontal: layout.spacing.md,
     },
   });
   
@@ -116,6 +134,7 @@ const Button: React.FC<ButtonProps> = ({
               styles[`${size}Text`],
               variant === 'outline' && styles.outlineText,
               variant === 'text' && styles.textVariantText,
+              variant === 'destructive' && styles.destructiveText,
               disabled && styles.disabledText,
               icon && styles.textWithIcon,
               textStyle
@@ -131,15 +150,44 @@ const Button: React.FC<ButtonProps> = ({
   if (variant === 'primary' || variant === 'secondary') {
     return (
       <TouchableOpacity
-        onPress={onPress}
+        onPress={handlePress}
         disabled={disabled || loading}
         testID={testID}
         style={[styles.buttonContainer, style]}
+        hitSlop={layout.hitSlop.small}
+        activeOpacity={0.8}
       >
         <LinearGradient
-          colors={variant === 'primary' ? [theme.primary, theme.primaryLight] : [theme.secondary, theme.accent2]}
+          colors={variant === 'primary' ? theme.gradient.primary : theme.gradient.secondary}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[
+            styles.button,
+            styles[`${size}Button`],
+            disabled && styles.disabledButton,
+            icon && !title && styles.iconOnlyButton,
+          ]}
+        >
+          {getButtonContent()}
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  }
+
+  if (variant === 'destructive') {
+    return (
+      <TouchableOpacity
+        onPress={handlePress}
+        disabled={disabled || loading}
+        testID={testID}
+        style={[styles.buttonContainer, style]}
+        hitSlop={layout.hitSlop.small}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={[theme.error, '#FF6B6B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={[
             styles.button,
             styles[`${size}Button`],
@@ -155,7 +203,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || loading}
       testID={testID}
       style={[
@@ -167,6 +215,8 @@ const Button: React.FC<ButtonProps> = ({
         icon && !title && styles.iconOnlyButton,
         style,
       ]}
+      hitSlop={layout.hitSlop.small}
+      activeOpacity={0.7}
     >
       {getButtonContent()}
     </TouchableOpacity>
