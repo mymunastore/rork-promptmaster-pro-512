@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import { PromptTemplate } from '@/types/prompt';
 import Card from './Card';
-import colors from '@/constants/colors';
 import layout from '@/constants/layout';
 import { ChevronRight } from 'lucide-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 interface TemplateCardProps {
   template: PromptTemplate;
@@ -13,6 +13,69 @@ interface TemplateCardProps {
 }
 
 const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPress, testID }) => {
+  const { theme } = useTheme();
+  
+  const styles = StyleSheet.create({
+    card: {
+      marginBottom: layout.spacing.md,
+    },
+    content: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+    },
+    image: {
+      width: 60,
+      height: 60,
+      borderRadius: layout.borderRadius.md,
+      marginRight: layout.spacing.md,
+    },
+    textContainer: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.xs,
+    },
+    description: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      marginBottom: layout.spacing.xs,
+    },
+    tagsContainer: {
+      flexDirection: 'row' as const,
+      flexWrap: 'wrap' as const,
+    },
+    categoryTag: {
+      backgroundColor: theme.primaryLight,
+      paddingHorizontal: layout.spacing.sm,
+      paddingVertical: layout.spacing.xs / 2,
+      borderRadius: layout.borderRadius.sm,
+      marginRight: layout.spacing.xs,
+      marginBottom: layout.spacing.xs,
+    },
+    categoryText: {
+      color: theme.background,
+      fontSize: 12,
+      fontWeight: '500' as const,
+    },
+    tag: {
+      backgroundColor: theme.card,
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingHorizontal: layout.spacing.sm,
+      paddingVertical: layout.spacing.xs / 2,
+      borderRadius: layout.borderRadius.sm,
+      marginRight: layout.spacing.xs,
+      marginBottom: layout.spacing.xs,
+    },
+    tagText: {
+      color: theme.textSecondary,
+      fontSize: 12,
+    },
+  });
+  
   return (
     <TouchableOpacity 
       onPress={() => onPress(template)} 
@@ -44,70 +107,13 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPress, testID }
               ))}
             </View>
           </View>
-          <ChevronRight size={20} color={colors.textSecondary} />
+          <ChevronRight size={20} color={theme.textSecondary} />
         </View>
       </Card>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    marginBottom: layout.spacing.md,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: layout.borderRadius.md,
-    marginRight: layout.spacing.md,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: layout.spacing.xs,
-  },
-  description: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: layout.spacing.xs,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  categoryTag: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: layout.spacing.sm,
-    paddingVertical: layout.spacing.xs / 2,
-    borderRadius: layout.borderRadius.sm,
-    marginRight: layout.spacing.xs,
-    marginBottom: layout.spacing.xs,
-  },
-  categoryText: {
-    color: colors.card,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  tag: {
-    backgroundColor: colors.background,
-    paddingHorizontal: layout.spacing.sm,
-    paddingVertical: layout.spacing.xs / 2,
-    borderRadius: layout.borderRadius.sm,
-    marginRight: layout.spacing.xs,
-    marginBottom: layout.spacing.xs,
-  },
-  tagText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-});
+
 
 export default TemplateCard;

@@ -20,6 +20,12 @@ interface UserProfile {
   bio: string;
   joinDate: string;
   avatar?: string;
+  avatarColor?: string;
+  preferences?: {
+    favoriteCategories: string[];
+    defaultTone: string;
+    autoSave: boolean;
+  };
 }
 
 const PROFILE_STORAGE_KEY = 'user_profile';
@@ -33,6 +39,12 @@ export default function ProfileScreen() {
     email: 'user@example.com',
     bio: 'Creating amazing prompts for AI tools',
     joinDate: new Date().toISOString().split('T')[0],
+    avatarColor: theme.primaryLight,
+    preferences: {
+      favoriteCategories: [],
+      defaultTone: 'professional',
+      autoSave: true,
+    },
   });
   
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -97,8 +109,37 @@ export default function ProfileScreen() {
   const handleAvatarPress = () => {
     Alert.alert(
       'Profile Picture',
-      'Profile picture upload is coming soon! You\'ll be able to upload and customize your avatar.',
-      [{ text: 'OK' }]
+      'Choose how you\'d like to update your profile picture:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Choose Color',
+          onPress: () => {
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            const updatedProfile = { ...editedProfile, avatarColor: randomColor };
+            setEditedProfile(updatedProfile);
+            
+            if (!isEditing) {
+              setProfile(updatedProfile);
+              AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile));
+            }
+            
+            Alert.alert('Avatar Updated!', 'Your avatar color has been changed.');
+          }
+        },
+        {
+          text: 'Upload Photo',
+          onPress: () => {
+            Alert.alert(
+              'Coming Soon',
+              'Photo upload feature will be available in the next update! For now, you can customize your avatar color.',
+              [{ text: 'OK' }]
+            );
+          }
+        }
+      ]
     );
   };
   
@@ -140,10 +181,17 @@ export default function ProfileScreen() {
       width: 100,
       height: 100,
       borderRadius: 50,
-      backgroundColor: theme.primaryLight,
+      backgroundColor: (isEditing ? editedProfile.avatarColor : profile.avatarColor) || theme.primaryLight,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
       marginBottom: layout.spacing.sm,
+      borderWidth: 3,
+      borderColor: theme.background,
+      shadowColor: theme.text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
     },
     avatarText: {
       fontSize: 32,
@@ -409,13 +457,13 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>
-                  {Math.floor(Math.random() * 50) + 10}
+                  {savedPrompts.filter(p => p.isFavorite).length}
                 </Text>
-                <Text style={styles.statLabel}>Templates{'\n'}Used</Text>
+                <Text style={styles.statLabel}>Favorite{'\n'}Prompts</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>
-                  {Math.floor(savedPrompts.length / 7) + 1}
+                  {Math.max(1, Math.floor((Date.now() - new Date(profile.joinDate).getTime()) / (1000 * 60 * 60 * 24)))}
                 </Text>
                 <Text style={styles.statLabel}>Days{'\n'}Active</Text>
               </View>

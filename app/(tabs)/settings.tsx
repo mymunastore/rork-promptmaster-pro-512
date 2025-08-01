@@ -13,7 +13,9 @@ import {
   ChevronRight,
   Settings,
   Smartphone,
-  Globe
+  Globe,
+  Download,
+  Upload
 } from 'lucide-react-native';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
@@ -72,6 +74,12 @@ export default function SettingsScreen() {
   
   const handleClearData = () => {
     const promptCount = savedPrompts.length;
+    
+    if (promptCount === 0) {
+      Alert.alert('No Data', 'There are no saved prompts to clear.');
+      return;
+    }
+    
     Alert.alert(
       'Clear All Data',
       `Are you sure you want to delete all ${promptCount} saved prompts? This action cannot be undone.`,
@@ -86,8 +94,15 @@ export default function SettingsScreen() {
           onPress: async () => {
             setIsLoading(true);
             try {
-              // Clear all AsyncStorage data
-              await AsyncStorage.clear();
+              // Clear specific app data keys instead of all AsyncStorage
+              const keysToRemove = [
+                'ai_prompt_generator_saved_prompts',
+                'user_profile',
+                'notifications_enabled',
+                'app_theme_mode'
+              ];
+              
+              await AsyncStorage.multiRemove(keysToRemove);
               
               // Force a page reload to reset all app state
               if (Platform.OS === 'web') {
@@ -116,45 +131,85 @@ export default function SettingsScreen() {
   const handleShare = async () => {
     try {
       const shareMessage = 'Check out this amazing AI Prompt Generator app! Create professional-grade prompts for any AI tool. 🚀';
+      const shareUrl = Platform.OS === 'web' ? window.location.href : 'https://aipromptgenerator.app';
       
       if (Platform.OS === 'web') {
         // Web sharing
-        if (navigator.share) {
-          await navigator.share({
+        if (navigator.share && navigator.canShare) {
+          const shareData = {
             title: 'AI Prompt Generator',
             text: shareMessage,
-            url: window.location.href,
-          });
+            url: shareUrl,
+          };
+          
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+          } else {
+            // Fallback to clipboard
+            await navigator.clipboard.writeText(`${shareMessage} ${shareUrl}`);
+            Alert.alert('Copied!', 'Share message copied to clipboard.');
+          }
         } else {
           // Fallback for web browsers without native sharing
-          await Linking.openURL(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`);
+          const tweetText = encodeURIComponent(`${shareMessage} ${shareUrl}`);
+          await Linking.openURL(`https://twitter.com/intent/tweet?text=${tweetText}`);
         }
       } else {
         // Native sharing
         await Share.share({
-          message: shareMessage,
+          message: `${shareMessage} ${shareUrl}`,
           title: 'AI Prompt Generator',
+          url: shareUrl,
         });
       }
       console.log('App shared successfully');
     } catch (error) {
       console.error('Error sharing app:', error);
-      Alert.alert('Error', 'Failed to share the app. Please try again.');
+      if (error.message !== 'User did not share') {
+        Alert.alert('Error', 'Failed to share the app. Please try again.');
+      }
     }
   };
 
   const handleSupport = () => {
     Alert.alert(
       'Help & Support',
-      'Need help? Here are your options:\n\n• Email: support@aipromptgenerator.com\n• FAQ: Check our frequently asked questions\n• Feedback: Share your suggestions',
+      'Need help? Here are your options:\n\n• Email: support@aipromptgenerator.com\n• FAQ: Check our frequently asked questions\n• Feedback: Share your suggestions\n• Bug Report: Report issues or bugs',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Send Email',
           onPress: () => {
-            const emailUrl = `mailto:support@aipromptgenerator.com?subject=AI Prompt Generator Support&body=Hi, I need help with...`;
+            const deviceInfo = Platform.select({
+              ios: 'iOS',
+              android: 'Android',
+              web: 'Web',
+              default: 'Unknown'
+            });
+            
+            const emailBody = `Hi,\n\nI need help with...\n\n---\nDevice: ${deviceInfo}\nApp Version: 1.0.0\nSaved Prompts: ${savedPrompts.length}\nTheme: ${themeMode}`;
+            const emailUrl = `mailto:support@aipromptgenerator.com?subject=AI Prompt Generator Support&body=${encodeURIComponent(emailBody)}`;
+            
             Linking.openURL(emailUrl).catch(() => {
-              Alert.alert('Error', 'Could not open email client');
+              Alert.alert('Error', 'Could not open email client. Please email us at support@aipromptgenerator.com');
+            });
+          }
+        },
+        {
+          text: 'Report Bug',
+          onPress: () => {
+            const deviceInfo = Platform.select({
+              ios: 'iOS',
+              android: 'Android', 
+              web: 'Web',
+              default: 'Unknown'
+            });
+            
+            const bugReportBody = `Bug Report:\n\nDescribe the issue:\n\n\nSteps to reproduce:\n1. \n2. \n3. \n\nExpected behavior:\n\n\nActual behavior:\n\n\n---\nDevice: ${deviceInfo}\nApp Version: 1.0.0\nSaved Prompts: ${savedPrompts.length}\nTheme: ${themeMode}`;
+            const emailUrl = `mailto:support@aipromptgenerator.com?subject=Bug Report - AI Prompt Generator&body=${encodeURIComponent(bugReportBody)}`;
+            
+            Linking.openURL(emailUrl).catch(() => {
+              Alert.alert('Error', 'Could not open email client. Please email us at support@aipromptgenerator.com');
             });
           }
         }
@@ -174,6 +229,73 @@ export default function SettingsScreen() {
       'About AI Prompt Generator',
       `Version 1.0.0\nPlatform: ${deviceInfo}\nPrompts Saved: ${savedPrompts.length}\n\nAI Prompt Generator is a powerful tool designed to help you create professional-grade prompts for any AI tool. Create, customize, and optimize your prompts for better results.\n\nFeatures:\n• Template library\n• Custom prompt creation\n• Keyword suggestions\n• Cross-platform sync`,
       [{ text: 'OK' }]
+    );
+  };
+  
+  const handleExportData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Get all user data
+      const userData = {
+        prompts: savedPrompts,
+        profile: await AsyncStorage.getItem('user_profile'),
+        settings: {
+          notifications: notificationsEnabled,
+          theme: themeMode,
+        },
+        exportDate: new Date().toISOString(),
+        version: '1.0.0'
+      };
+      
+      const dataString = JSON.stringify(userData, null, 2);
+      
+      if (Platform.OS === 'web') {
+        // Web: Download as file
+        const blob = new Blob([dataString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ai-prompt-generator-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        Alert.alert('Success', 'Your data has been downloaded as a JSON file.');
+      } else {
+        // Mobile: Share the data
+        await Share.share({
+          message: dataString,
+          title: 'AI Prompt Generator Data Export',
+        });
+      }
+      
+      console.log('Data exported successfully');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      Alert.alert('Error', 'Failed to export data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleImportData = () => {
+    Alert.alert(
+      'Import Data',
+      'Data import feature is coming soon! You\'ll be able to restore your prompts and settings from a backup file.',
+      [
+        { text: 'OK' },
+        {
+          text: 'Learn More',
+          onPress: () => {
+            Alert.alert(
+              'Import Instructions',
+              'When available, you\'ll be able to:\n\n• Import from JSON backup files\n• Restore prompts and settings\n• Merge with existing data\n• Validate data integrity\n\nThis feature will be available in the next update!'
+            );
+          }
+        }
+      ]
     );
   };
 
@@ -431,6 +553,49 @@ export default function SettingsScreen() {
               <Text style={[styles.storageText, { color: theme.background }]}>{savedPrompts.length}</Text>
             </View>
           </View>
+          
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
+          
+          <Pressable 
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.settingItemPressed
+            ]}
+            onPress={handleExportData}
+            testID="export-data-setting"
+            disabled={isLoading}
+          >
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.accent3}15` }]}>
+              <Download size={20} color={theme.accent3} />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Export Data</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                {isLoading ? 'Exporting...' : 'Download backup of your prompts and settings'}
+              </Text>
+            </View>
+            <ChevronRight size={20} color={theme.textSecondary} />
+          </Pressable>
+          
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
+          
+          <Pressable 
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.settingItemPressed
+            ]}
+            onPress={handleImportData}
+            testID="import-data-setting"
+          >
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.accent4}15` }]}>
+              <Upload size={20} color={theme.accent4} />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Import Data</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Restore prompts and settings from backup</Text>
+            </View>
+            <ChevronRight size={20} color={theme.textSecondary} />
+          </Pressable>
           
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
