@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 
@@ -32,33 +32,33 @@ const Card: React.FC<CardProps> = ({
 
   const styles = StyleSheet.create({
     card: {
-      backgroundColor: theme.card,
+      backgroundColor: theme.card + 'E6',
       borderRadius: layout.borderRadius.xl,
       padding: getPadding(),
       overflow: 'hidden',
+
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     default: {
       ...layout.shadows.small,
-      borderWidth: Platform.select({
-        ios: 0,
-        android: 0.5,
-        web: 1,
-      }),
-      borderColor: theme.border + '20',
+      backgroundColor: theme.card + 'CC',
     },
     elevated: {
       ...layout.shadows.medium,
-      borderWidth: 0,
+      backgroundColor: theme.card + 'E6',
+      borderColor: 'rgba(255, 255, 255, 0.15)',
     },
     outlined: {
       borderWidth: 1.5,
-      borderColor: theme.border,
+      borderColor: theme.primary + '40',
+      backgroundColor: theme.card + '80',
       shadowOpacity: 0,
       elevation: 0,
     },
     filled: {
-      backgroundColor: theme.backgroundAccent,
-      borderWidth: 0,
+      backgroundColor: theme.backgroundAccent + 'CC',
+      borderColor: 'rgba(255, 255, 255, 0.08)',
       shadowOpacity: 0,
       elevation: 0,
     },

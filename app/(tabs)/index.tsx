@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { PlusCircle, Sparkles, BookOpen, Wand2, Brain, Rocket } from 'lucide-react-native';
+import { Sparkles, BookOpen, Brain, Rocket, Zap, Star } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Button from '@/components/Button';
@@ -47,7 +47,7 @@ export default function HomeScreen() {
       paddingBottom: layout.spacing.xxl,
     },
     heroSection: {
-      paddingTop: layout.spacing.xxl,
+      paddingTop: layout.spacing.xxl + layout.spacing.lg,
       paddingBottom: layout.spacing.xl,
       paddingHorizontal: layout.spacing.lg,
       alignItems: 'center',
@@ -56,24 +56,28 @@ export default function HomeScreen() {
       alignItems: 'center',
       maxWidth: 400,
     },
-    heroIcon: {
-      marginBottom: layout.spacing.md,
+    heroIconContainer: {
+      backgroundColor: theme.primary + '20',
+      borderRadius: layout.borderRadius.round,
+      padding: layout.spacing.md,
+      marginBottom: layout.spacing.lg,
     },
     heroTitle: {
-      fontSize: layout.typography.sizes.largeTitle,
+      fontSize: layout.typography.sizes.largeTitle + 4,
       fontWeight: layout.typography.weights.heavy,
       color: theme.text,
       textAlign: 'center',
       marginBottom: layout.spacing.sm,
-      letterSpacing: -0.5,
+      letterSpacing: -0.8,
     },
     heroSubtitle: {
-      fontSize: layout.typography.sizes.callout,
+      fontSize: layout.typography.sizes.subheadline,
       color: theme.textSecondary,
       textAlign: 'center',
       marginBottom: layout.spacing.xl,
-      lineHeight: 22,
-      letterSpacing: -0.2,
+      lineHeight: 24,
+      letterSpacing: -0.3,
+      opacity: 0.9,
     },
     heroButtons: {
       flexDirection: 'row',
@@ -88,11 +92,13 @@ export default function HomeScreen() {
       minWidth: 140,
     },
     featuresSection: {
-      padding: layout.spacing.lg,
-      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      padding: layout.spacing.xl,
+      backgroundColor: 'rgba(255, 255, 255, 0.03)',
       marginHorizontal: layout.spacing.lg,
-      borderRadius: layout.borderRadius.xl,
-      marginBottom: layout.spacing.lg,
+      borderRadius: layout.borderRadius.xl + 4,
+      marginBottom: layout.spacing.xl,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.08)',
     },
     sectionTitle: {
       fontSize: layout.typography.sizes.title2,
@@ -112,18 +118,20 @@ export default function HomeScreen() {
       marginBottom: layout.spacing.lg,
       alignItems: 'center',
       padding: layout.spacing.lg,
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-      borderRadius: layout.borderRadius.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+      borderRadius: layout.borderRadius.xl,
       borderWidth: 1,
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
     },
     featureIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: layout.borderRadius.round,
+      width: 64,
+      height: 64,
+      borderRadius: layout.borderRadius.xl,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: layout.spacing.md,
+      borderWidth: 2,
+      borderColor: 'rgba(255, 255, 255, 0.15)',
     },
     featureTitle: {
       fontSize: layout.typography.sizes.callout,
@@ -141,11 +149,13 @@ export default function HomeScreen() {
       letterSpacing: -0.1,
     },
     templatesSection: {
-      paddingHorizontal: layout.spacing.lg,
-      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+      paddingHorizontal: layout.spacing.xl,
+      backgroundColor: 'rgba(255, 255, 255, 0.02)',
       marginHorizontal: layout.spacing.lg,
-      borderRadius: layout.borderRadius.xl,
-      paddingVertical: layout.spacing.lg,
+      borderRadius: layout.borderRadius.xl + 4,
+      paddingVertical: layout.spacing.xl,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.06)',
     },
     sectionHeader: {
       flexDirection: 'row',
@@ -163,14 +173,20 @@ export default function HomeScreen() {
       marginTop: layout.spacing.sm,
     },
     createNewCard: {
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-      borderRadius: layout.borderRadius.lg,
-      padding: layout.spacing.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+      borderRadius: layout.borderRadius.xl,
+      padding: layout.spacing.xl,
       marginBottom: layout.spacing.md,
       alignItems: 'center',
       borderWidth: 2,
-      borderColor: theme.primary + '40',
+      borderColor: theme.primary + '30',
       borderStyle: 'dashed',
+    },
+    createNewIconContainer: {
+      backgroundColor: theme.primary + '20',
+      borderRadius: layout.borderRadius.round,
+      padding: layout.spacing.sm,
+      marginBottom: layout.spacing.md,
     },
     createNewText: {
       fontSize: layout.typography.sizes.callout,
@@ -198,10 +214,12 @@ export default function HomeScreen() {
       >
         <View style={styles.heroSection}>
           <View style={styles.heroContent}>
-            <Wand2 size={48} color={theme.primary} style={styles.heroIcon} />
+            <View style={styles.heroIconContainer}>
+              <Zap size={32} color={theme.primary} />
+            </View>
             <Text style={styles.heroTitle}>AI Prompt Studio</Text>
             <Text style={styles.heroSubtitle}>
-              Create world-class AI prompts with professional templates, smart optimization, and advanced features
+              Create world-class AI prompts with professional templates, smart optimization, and advanced features ✨
             </Text>
             <View style={styles.heroButtons}>
               <Button 
@@ -226,8 +244,8 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Powerful Features</Text>
           <View style={styles.featuresGrid}>
             <Card variant="elevated" style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '20' }]}>
-                <Brain size={28} color={theme.accent1} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '15' }]}>
+                <Brain size={32} color={theme.accent1} />
               </View>
               <Text style={styles.featureTitle}>Smart Templates</Text>
               <Text style={styles.featureDescription}>
@@ -236,8 +254,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card variant="elevated" style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '20' }]}>
-                <Rocket size={28} color={theme.accent2} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '15' }]}>
+                <Rocket size={32} color={theme.accent2} />
               </View>
               <Text style={styles.featureTitle}>Optimization</Text>
               <Text style={styles.featureDescription}>
@@ -246,8 +264,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card variant="elevated" style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '20' }]}>
-                <Sparkles size={28} color={theme.accent3} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '15' }]}>
+                <Sparkles size={32} color={theme.accent3} />
               </View>
               <Text style={styles.featureTitle}>Advanced Tools</Text>
               <Text style={styles.featureDescription}>
@@ -256,8 +274,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card variant="elevated" style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '20' }]}>
-                <BookOpen size={28} color={theme.accent4} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '15' }]}>
+                <BookOpen size={32} color={theme.accent4} />
               </View>
               <Text style={styles.featureTitle}>Smart Library</Text>
               <Text style={styles.featureDescription}>
@@ -296,10 +314,12 @@ export default function HomeScreen() {
               onPress={navigateToNewPrompt}
               testID="create-new-card"
             >
-              <PlusCircle size={32} color={theme.primary} />
+              <View style={styles.createNewIconContainer}>
+                <Star size={24} color={theme.primary} />
+              </View>
               <Text style={styles.createNewText}>Create Custom Prompt</Text>
               <Text style={styles.createNewDescription}>
-                Start from scratch with your own prompt
+                Start from scratch with your own prompt ✨
               </Text>
             </TouchableOpacity>
           </View>

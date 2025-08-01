@@ -58,39 +58,39 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   const getGradientColors = (): readonly [string, string, ...string[]] => {
     switch (variant) {
       case 'aurora':
-        return ["#4facfe", "#00f2fe", "#43e97b"] as const;
+        return ["#22D3EE", "#3B82F6", "#A78BFA"] as const;
       case 'sunset':
-        return ["#fa709a", "#fee140", "#ffeaa7"] as const;
+        return ["#FBBF24", "#F472B6", "#A78BFA"] as const;
       case 'ocean':
-        return ["#2196F3", "#21CBF3", "#4ECDC4"] as const;
+        return ["#22D3EE", "#3B82F6", "#34D399"] as const;
       default:
-        return ["#667eea", "#764ba2", "#f093fb"] as const;
+        return ["#8B5CF6", "#A855F7", "#F472B6"] as const;
     }
   };
 
   const getReversedGradientColors = (): readonly [string, string, ...string[]] => {
     switch (variant) {
       case 'aurora':
-        return ["#43e97b", "#00f2fe", "#4facfe"] as const;
+        return ["#A78BFA", "#3B82F6", "#22D3EE"] as const;
       case 'sunset':
-        return ["#ffeaa7", "#fee140", "#fa709a"] as const;
+        return ["#A78BFA", "#F472B6", "#FBBF24"] as const;
       case 'ocean':
-        return ["#4ECDC4", "#21CBF3", "#2196F3"] as const;
+        return ["#34D399", "#3B82F6", "#22D3EE"] as const;
       default:
-        return ["#f093fb", "#764ba2", "#667eea"] as const;
+        return ["#F472B6", "#A855F7", "#8B5CF6"] as const;
     }
   };
 
   const getSlicedGradientColors = (): readonly [string, string, ...string[]] => {
     switch (variant) {
       case 'aurora':
-        return ["#00f2fe", "#43e97b"] as const;
+        return ["#3B82F6", "#A78BFA"] as const;
       case 'sunset':
-        return ["#fee140", "#ffeaa7"] as const;
+        return ["#F472B6", "#A78BFA"] as const;
       case 'ocean':
-        return ["#21CBF3", "#4ECDC4"] as const;
+        return ["#3B82F6", "#34D399"] as const;
       default:
-        return ["#764ba2", "#f093fb"] as const;
+        return ["#A855F7", "#F472B6"] as const;
     }
   };
 
