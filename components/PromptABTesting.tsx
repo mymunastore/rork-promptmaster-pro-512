@@ -312,7 +312,7 @@ const PromptABTesting: React.FC<PromptABTestingProps> = ({
         variant="primary"
         style={styles.testButton}
         disabled={isTesting || !promptA.trim() || !promptB.trim()}
-        icon={<Play size={16} color={theme.card} />}
+        icon={Play}
         testID="run-test-button"
       />
 
