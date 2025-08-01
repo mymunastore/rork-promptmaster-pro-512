@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PromptStoreProvider } from "@/hooks/usePromptStore";
+import { ThemeProvider } from "@/hooks/useTheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -30,11 +31,13 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PromptStoreProvider>
-        <GestureWrapper style={{ flex: 1 }}>
-          <RootLayoutNav />
-        </GestureWrapper>
-      </PromptStoreProvider>
+      <ThemeProvider>
+        <PromptStoreProvider>
+          <GestureWrapper style={{ flex: 1 }}>
+            <RootLayoutNav />
+          </GestureWrapper>
+        </PromptStoreProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

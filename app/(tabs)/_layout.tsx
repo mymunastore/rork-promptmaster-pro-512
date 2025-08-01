@@ -1,21 +1,31 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Home, BookTemplate, Bookmark, Settings } from "lucide-react-native";
-import colors from "@/constants/colors";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+  
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.inactive,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.inactive,
         headerShown: true,
         tabBarStyle: {
-          borderTopColor: colors.border,
+          backgroundColor: theme.card,
+          borderTopColor: theme.border,
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          fontWeight: '500' as const,
+        },
+        headerStyle: {
+          backgroundColor: theme.background,
+        },
+        headerTintColor: theme.text,
+        headerTitleStyle: {
+          fontWeight: '600' as const,
         },
       }}
     >

@@ -4,6 +4,7 @@ import {
   User, 
   Bell, 
   Moon, 
+  Sun,
   Share2, 
   HelpCircle, 
   Info, 
@@ -13,18 +14,18 @@ import {
   Smartphone,
   Globe
 } from 'lucide-react-native';
-import colors from '@/constants/colors';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
 import { usePromptStore } from '@/hooks/usePromptStore';
+import { useTheme } from '@/hooks/useTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
   const { savedPrompts } = usePromptStore();
+  const { theme, themeMode, isDark, toggleTheme, isLoading: themeLoading } = useTheme();
   
   // Settings state
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   // Load settings from AsyncStorage
@@ -35,13 +36,9 @@ export default function SettingsScreen() {
   const loadSettings = async () => {
     try {
       const notifications = await AsyncStorage.getItem('notifications_enabled');
-      const darkMode = await AsyncStorage.getItem('dark_mode_enabled');
       
       if (notifications !== null) {
         setNotificationsEnabled(JSON.parse(notifications));
-      }
-      if (darkMode !== null) {
-        setDarkModeEnabled(JSON.parse(darkMode));
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -62,15 +59,9 @@ export default function SettingsScreen() {
     console.log('Notifications:', value ? 'enabled' : 'disabled');
   };
   
-  const handleDarkModeToggle = (value: boolean) => {
-    setDarkModeEnabled(value);
-    saveSettings('dark_mode_enabled', value);
-    console.log('Dark mode:', value ? 'enabled' : 'disabled');
-    Alert.alert(
-      'Theme Change',
-      'Dark mode will be applied in the next app update. This feature is coming soon!',
-      [{ text: 'OK' }]
-    );
+  const handleDarkModeToggle = () => {
+    toggleTheme();
+    console.log('Theme toggled to:', themeMode === 'dark' ? 'light' : 'dark');
   };
   
   const handleProfilePress = () => {
@@ -176,6 +167,101 @@ export default function SettingsScreen() {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    contentContainer: {
+      padding: layout.spacing.lg,
+    },
+    section: {
+      marginBottom: layout.spacing.xl,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.md,
+      paddingHorizontal: layout.spacing.xs,
+    },
+    card: {
+      padding: 0,
+      overflow: 'hidden',
+      backgroundColor: theme.card,
+    },
+    settingItem: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      padding: layout.spacing.md,
+      minHeight: 64,
+    },
+    settingItemPressed: {
+      backgroundColor: `${theme.primary}08`,
+    },
+    settingIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: layout.borderRadius.md,
+      backgroundColor: `${theme.primary}15`,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+      marginRight: layout.spacing.md,
+    },
+    settingContent: {
+      flex: 1,
+    },
+    settingTitle: {
+      fontSize: 16,
+      fontWeight: '500' as const,
+      color: theme.text,
+      marginBottom: 2,
+    },
+    settingDescription: {
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginHorizontal: layout.spacing.md,
+    },
+    footer: {
+      alignItems: 'center' as const,
+      marginTop: layout.spacing.xl,
+      marginBottom: layout.spacing.xxl,
+    },
+    footerText: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.xs,
+    },
+    footerSubtext: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      marginBottom: layout.spacing.xs,
+    },
+    footerCopyright: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      opacity: 0.7,
+    },
+    storageIndicator: {
+      backgroundColor: theme.primaryLight,
+      paddingHorizontal: layout.spacing.sm,
+      paddingVertical: layout.spacing.xs,
+      borderRadius: layout.borderRadius.md,
+      minWidth: 32,
+      alignItems: 'center' as const,
+    },
+    storageText: {
+      fontSize: 12,
+      fontWeight: '600' as const,
+      color: theme.background,
+    },
+  });
+
   return (
     <ScrollView 
       style={styles.container}
@@ -194,57 +280,62 @@ export default function SettingsScreen() {
             onPress={handleProfilePress}
             testID="profile-setting"
           >
-            <View style={styles.settingIconContainer}>
-              <User size={20} color={colors.primary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.primary}15` }]}>
+              <User size={20} color={theme.primary} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Profile</Text>
-              <Text style={styles.settingDescription}>Manage your account details</Text>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Profile</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Manage your account details</Text>
             </View>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            <ChevronRight size={20} color={theme.textSecondary} />
           </Pressable>
           
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
           <View style={styles.settingItem}>
-            <View style={styles.settingIconContainer}>
-              <Bell size={20} color={colors.primary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.primary}15` }]}>
+              <Bell size={20} color={theme.primary} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Notifications</Text>
-              <Text style={styles.settingDescription}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Notifications</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
                 {notificationsEnabled ? 'Enabled' : 'Disabled'} • Get updates about new features
               </Text>
             </View>
             <Switch
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={notificationsEnabled ? colors.primary : colors.card}
-              ios_backgroundColor={colors.border}
+              trackColor={{ false: theme.border, true: theme.primaryLight }}
+              thumbColor={notificationsEnabled ? theme.primary : theme.card}
+              ios_backgroundColor={theme.border}
               value={notificationsEnabled}
               onValueChange={handleNotificationToggle}
               testID="notifications-switch"
             />
           </View>
           
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
           <View style={styles.settingItem}>
-            <View style={styles.settingIconContainer}>
-              <Moon size={20} color={colors.primary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.primary}15` }]}>
+              {isDark ? (
+                <Moon size={20} color={theme.primary} />
+              ) : (
+                <Sun size={20} color={theme.primary} />
+              )}
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Dark Mode</Text>
-              <Text style={styles.settingDescription}>
-                {darkModeEnabled ? 'Enabled' : 'Disabled'} • Coming soon!
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Dark Mode</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                {isDark ? 'Enabled' : 'Disabled'} • Switch between light and dark themes
               </Text>
             </View>
             <Switch
-              trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={darkModeEnabled ? colors.primary : colors.card}
-              ios_backgroundColor={colors.border}
-              value={darkModeEnabled}
+              trackColor={{ false: theme.border, true: theme.primaryLight }}
+              thumbColor={isDark ? theme.primary : theme.card}
+              ios_backgroundColor={theme.border}
+              value={isDark}
               onValueChange={handleDarkModeToggle}
               testID="dark-mode-switch"
+              disabled={themeLoading}
             />
           </View>
         </Card>
@@ -261,17 +352,17 @@ export default function SettingsScreen() {
             onPress={handleShare}
             testID="share-app-setting"
           >
-            <View style={styles.settingIconContainer}>
-              <Share2 size={20} color={colors.secondary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.secondary}15` }]}>
+              <Share2 size={20} color={theme.secondary} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Share App</Text>
-              <Text style={styles.settingDescription}>Tell others about this amazing app</Text>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Share App</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Tell others about this amazing app</Text>
             </View>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            <ChevronRight size={20} color={theme.textSecondary} />
           </Pressable>
           
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
           <Pressable 
             style={({ pressed }) => [
@@ -281,17 +372,17 @@ export default function SettingsScreen() {
             onPress={handleSupport}
             testID="support-setting"
           >
-            <View style={styles.settingIconContainer}>
-              <HelpCircle size={20} color={colors.secondary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.secondary}15` }]}>
+              <HelpCircle size={20} color={theme.secondary} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Help & Support</Text>
-              <Text style={styles.settingDescription}>Get assistance and send feedback</Text>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Help & Support</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Get assistance and send feedback</Text>
             </View>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            <ChevronRight size={20} color={theme.textSecondary} />
           </Pressable>
           
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
           <Pressable 
             style={({ pressed }) => [
@@ -301,14 +392,14 @@ export default function SettingsScreen() {
             onPress={handleAbout}
             testID="about-setting"
           >
-            <View style={styles.settingIconContainer}>
-              <Info size={20} color={colors.secondary} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.secondary}15` }]}>
+              <Info size={20} color={theme.secondary} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>About</Text>
-              <Text style={styles.settingDescription}>Version, stats, and app info</Text>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>About</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Version, stats, and app info</Text>
             </View>
-            <ChevronRight size={20} color={colors.textSecondary} />
+            <ChevronRight size={20} color={theme.textSecondary} />
           </Pressable>
         </Card>
       </View>
@@ -317,21 +408,21 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>Data & Storage</Text>
         <Card style={styles.card}>
           <View style={styles.settingItem}>
-            <View style={styles.settingIconContainer}>
-              <Settings size={20} color={colors.accent3} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.accent3}15` }]}>
+              <Settings size={20} color={theme.accent3} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Storage Info</Text>
-              <Text style={styles.settingDescription}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Storage Info</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
                 {savedPrompts.length} prompts saved • {Platform.OS === 'web' ? 'Browser' : 'Device'} storage
               </Text>
             </View>
-            <View style={styles.storageIndicator}>
-              <Text style={styles.storageText}>{savedPrompts.length}</Text>
+            <View style={[styles.storageIndicator, { backgroundColor: theme.primaryLight }]}>
+              <Text style={[styles.storageText, { color: theme.background }]}>{savedPrompts.length}</Text>
             </View>
           </View>
           
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
           
           <Pressable 
             style={({ pressed }) => [
@@ -342,16 +433,16 @@ export default function SettingsScreen() {
             testID="clear-data-setting"
             disabled={isLoading}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: 'rgba(255, 107, 107, 0.1)' }]}>
-              <Trash2 size={20} color={colors.error} />
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.error}15` }]}>
+              <Trash2 size={20} color={theme.error} />
             </View>
             <View style={styles.settingContent}>
-              <Text style={[styles.settingTitle, { color: colors.error }]}>Clear All Data</Text>
-              <Text style={styles.settingDescription}>
+              <Text style={[styles.settingTitle, { color: theme.error }]}>Clear All Data</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
                 {isLoading ? 'Clearing...' : `Delete all ${savedPrompts.length} saved prompts`}
               </Text>
             </View>
-            <ChevronRight size={20} color={colors.error} />
+            <ChevronRight size={20} color={theme.error} />
           </Pressable>
         </Card>
       </View>
@@ -360,16 +451,16 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>Device Info</Text>
         <Card style={styles.card}>
           <View style={styles.settingItem}>
-            <View style={styles.settingIconContainer}>
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.accent4}15` }]}>
               {Platform.OS === 'web' ? (
-                <Globe size={20} color={colors.accent4} />
+                <Globe size={20} color={theme.accent4} />
               ) : (
-                <Smartphone size={20} color={colors.accent4} />
+                <Smartphone size={20} color={theme.accent4} />
               )}
             </View>
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Platform</Text>
-              <Text style={styles.settingDescription}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Platform</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
                 {Platform.select({
                   ios: 'iOS Device',
                   android: 'Android Device',
@@ -383,104 +474,10 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>AI Prompt Generator v1.0.0</Text>
-        <Text style={styles.footerSubtext}>Platform: {Platform.OS} • Prompts: {savedPrompts.length}</Text>
-        <Text style={styles.footerCopyright}>© 2025 All Rights Reserved</Text>
+        <Text style={[styles.footerText, { color: theme.text }]}>AI Prompt Generator v1.0.0</Text>
+        <Text style={[styles.footerSubtext, { color: theme.textSecondary }]}>Platform: {Platform.OS} • Prompts: {savedPrompts.length}</Text>
+        <Text style={[styles.footerCopyright, { color: theme.textSecondary }]}>© 2025 All Rights Reserved</Text>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  contentContainer: {
-    padding: layout.spacing.lg,
-  },
-  section: {
-    marginBottom: layout.spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: layout.spacing.md,
-    paddingHorizontal: layout.spacing.xs,
-  },
-  card: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: layout.spacing.md,
-    minHeight: 64,
-  },
-  settingItemPressed: {
-    backgroundColor: 'rgba(98, 0, 238, 0.05)',
-  },
-  settingIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: layout.borderRadius.md,
-    backgroundColor: 'rgba(98, 0, 238, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: layout.spacing.md,
-  },
-  settingContent: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginHorizontal: layout.spacing.md,
-  },
-  footer: {
-    alignItems: 'center',
-    marginTop: layout.spacing.xl,
-    marginBottom: layout.spacing.xxl,
-  },
-  footerText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: layout.spacing.xs,
-  },
-  footerSubtext: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: layout.spacing.xs,
-  },
-  footerCopyright: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    opacity: 0.7,
-  },
-  storageIndicator: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: layout.spacing.sm,
-    paddingVertical: layout.spacing.xs,
-    borderRadius: layout.borderRadius.md,
-    minWidth: 32,
-    alignItems: 'center',
-  },
-  storageText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.background,
-  },
-});
