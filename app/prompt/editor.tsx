@@ -27,6 +27,7 @@ import TopicSuggestionCard from '@/components/TopicSuggestionCard';
 import PromptAnalytics from '@/components/PromptAnalytics';
 import PromptRewriter from '@/components/PromptRewriter';
 import PromptABTesting from '@/components/PromptABTesting';
+import PromptChatCompanion from '@/components/PromptChatCompanion';
 import { PromptCategory, TopicSuggestion } from '@/types/prompt';
 import { usePromptStore } from '@/hooks/usePromptStore';
 import templates from '@/mocks/templates';
@@ -48,6 +49,7 @@ export default function PromptEditorScreen() {
   const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
   const [showRewriter, setShowRewriter] = useState<boolean>(false);
   const [showABTesting, setShowABTesting] = useState<boolean>(false);
+  const [showChatCompanion, setShowChatCompanion] = useState<boolean>(false);
   const [promptB, setPromptB] = useState<string>('');
 
   // Initialize from template or saved prompt
@@ -165,6 +167,10 @@ export default function PromptEditorScreen() {
       `Prompt ${winner} performed better with a score of ${winner === 'A' ? results.promptA.score : results.promptB.score}!`,
       [{ text: 'OK' }]
     );
+  };
+
+  const handleChatSuggestion = (suggestion: string) => {
+    setContent(suggestion);
   };
 
   const renderCategoryButton = (categoryId: PromptCategory, label: string) => (
@@ -570,6 +576,28 @@ export default function PromptEditorScreen() {
                 promptB={promptB}
                 onTestComplete={handleABTestComplete}
                 testID="prompt-ab-testing"
+              />
+            </View>
+          )}
+        </View>
+
+        {/* AI Chat Companion Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowChatCompanion(!showChatCompanion)}
+            testID="toggle-chat-companion-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showChatCompanion ? 'Hide AI Assistant' : 'Show AI Assistant'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showChatCompanion && (
+            <View style={{ height: 400 }}>
+              <PromptChatCompanion 
+                onPromptSuggestion={handleChatSuggestion}
+                testID="prompt-chat-companion"
               />
             </View>
           )}
