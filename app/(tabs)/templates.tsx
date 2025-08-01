@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { StyleSheet, View, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Search, Filter } from 'lucide-react-native';
-import colors from '@/constants/colors';
+import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import TemplateCard from '@/components/TemplateCard';
 import CategorySelector from '@/components/CategorySelector';
 import EmptyState from '@/components/EmptyState';
-import AnimatedBackground from '@/components/AnimatedBackground';
+
 import { PromptCategory, PromptTemplate } from '@/types/prompt';
 import templates from '@/mocks/templates';
 
 export default function TemplatesScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<PromptCategory | null>(null);
 
@@ -34,15 +35,50 @@ export default function TemplatesScreen() {
     });
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    searchContainer: {
+      padding: layout.spacing.md,
+      backgroundColor: theme.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    searchInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.background,
+      borderRadius: layout.borderRadius.md,
+      paddingHorizontal: layout.spacing.md,
+    },
+    searchIcon: {
+      marginRight: layout.spacing.sm,
+    },
+    searchInput: {
+      flex: 1,
+      height: 44,
+      color: theme.text,
+      fontSize: 16,
+    },
+    templateCardContainer: {
+      paddingHorizontal: layout.spacing.md,
+    },
+    listContent: {
+      paddingBottom: layout.spacing.xxl,
+    },
+  });
+
   return (
     <View style={styles.container} testID="templates-screen">
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color={colors.textSecondary} style={styles.searchIcon} />
+          <Search size={20} color={theme.textSecondary} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search templates..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={theme.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             testID="search-input"
@@ -60,7 +96,7 @@ export default function TemplatesScreen() {
         <EmptyState
           title="No templates found"
           description="Try adjusting your search or category filters"
-          icon={<Filter size={48} color={colors.textSecondary} />}
+          icon={<Filter size={48} color={theme.textSecondary} />}
           testID="empty-state"
         />
       ) : (
@@ -84,38 +120,3 @@ export default function TemplatesScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  searchContainer: {
-    padding: layout.spacing.md,
-    backgroundColor: colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    borderRadius: layout.borderRadius.md,
-    paddingHorizontal: layout.spacing.md,
-  },
-  searchIcon: {
-    marginRight: layout.spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    height: 44,
-    color: colors.text,
-    fontSize: 16,
-  },
-  templateCardContainer: {
-    paddingHorizontal: layout.spacing.md,
-  },
-  listContent: {
-    paddingBottom: layout.spacing.xxl,
-  },
-});

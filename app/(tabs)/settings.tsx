@@ -163,7 +163,7 @@ export default function SettingsScreen() {
         });
       }
       console.log('App shared successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error sharing app:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage !== 'User did not share') {
