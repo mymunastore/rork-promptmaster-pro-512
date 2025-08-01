@@ -165,7 +165,8 @@ export default function SettingsScreen() {
       console.log('App shared successfully');
     } catch (error) {
       console.error('Error sharing app:', error);
-      if (error.message !== 'User did not share') {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage !== 'User did not share') {
         Alert.alert('Error', 'Failed to share the app. Please try again.');
       }
     }
