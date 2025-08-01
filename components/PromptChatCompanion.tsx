@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { MessageCircle, Send, Bot, User, Lightbulb, Copy, Check } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useApiKeys } from '@/hooks/useApiKeys';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
 
@@ -24,6 +25,7 @@ const PromptChatCompanion: React.FC<PromptChatCompanionProps> = ({
   testID 
 }) => {
   const { theme } = useTheme();
+  const { getApiEndpoint, hasValidApiKey, getActiveApiKey } = useApiKeys();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -49,6 +51,11 @@ const PromptChatCompanion: React.FC<PromptChatCompanionProps> = ({
   const sendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
 
+    if (!hasValidApiKey()) {
+      Alert.alert('API Key Required', 'Please configure your API keys in Settings to use this feature.');
+      return;
+    }
+
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
@@ -61,11 +68,18 @@ const PromptChatCompanion: React.FC<PromptChatCompanionProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://toolkit.rork.com/text/llm/', {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      const apiKey = getActiveApiKey();
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
+      const response = await fetch(getApiEndpoint(), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           messages: [
             {

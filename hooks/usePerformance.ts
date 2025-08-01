@@ -116,7 +116,7 @@ export const usePerformance = (
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
-        timeoutRef.current = setTimeout(() => func(...args), delay);
+        timeoutRef.current = setTimeout(() => func(...args), delay) as unknown as ReturnType<typeof setTimeout>;
       };
     },
     []

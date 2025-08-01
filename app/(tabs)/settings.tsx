@@ -19,6 +19,7 @@ import {
 } from 'lucide-react-native';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
+import ApiKeyManager from '@/components/ApiKeyManager';
 import { usePromptStore } from '@/hooks/usePromptStore';
 import { useTheme } from '@/hooks/useTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -472,6 +473,11 @@ export default function SettingsScreen() {
             />
           </View>
         </Card>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>AI Configuration</Text>
+        <ApiKeyManager testID="api-key-manager" />
       </View>
 
       <View style={styles.section}>

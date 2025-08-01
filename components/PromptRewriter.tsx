@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Wand2, Copy, Check } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useApiKeys } from '@/hooks/useApiKeys';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
@@ -20,6 +21,7 @@ const PromptRewriter: React.FC<PromptRewriterProps> = ({
   testID 
 }) => {
   const { theme } = useTheme();
+  const { getApiEndpoint, hasValidApiKey, getActiveApiKey } = useApiKeys();
   const [isRewriting, setIsRewriting] = useState<boolean>(false);
   const [rewrittenPrompt, setRewrittenPrompt] = useState<string>('');
   const [selectedStyle, setSelectedStyle] = useState<RewriteStyle>('professional');
@@ -39,13 +41,25 @@ const PromptRewriter: React.FC<PromptRewriterProps> = ({
       return;
     }
 
+    if (!hasValidApiKey()) {
+      Alert.alert('API Key Required', 'Please configure your API keys in Settings to use this feature.');
+      return;
+    }
+
     setIsRewriting(true);
     try {
-      const response = await fetch('https://toolkit.rork.com/text/llm/', {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      const apiKey = getActiveApiKey();
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
+      const response = await fetch(getApiEndpoint(), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           messages: [
             {

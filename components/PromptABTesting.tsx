@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { TestTube, Play, Trophy, BarChart3 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { useApiKeys } from '@/hooks/useApiKeys';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
@@ -45,6 +46,7 @@ const PromptABTesting: React.FC<PromptABTestingProps> = ({
   testID 
 }) => {
   const { theme } = useTheme();
+  const { getApiEndpoint, hasValidApiKey, getActiveApiKey } = useApiKeys();
   const [isTesting, setIsTesting] = useState<boolean>(false);
   const [testResults, setTestResults] = useState<TestResults | null>(null);
 
@@ -52,6 +54,11 @@ const PromptABTesting: React.FC<PromptABTestingProps> = ({
   const runABTest = async () => {
     if (!promptA.trim() || !promptB.trim()) {
       Alert.alert('Error', 'Both prompts must be provided for A/B testing');
+      return;
+    }
+
+    if (!hasValidApiKey()) {
+      Alert.alert('API Key Required', 'Please configure your API keys in Settings to use this feature.');
       return;
     }
 
@@ -87,11 +94,18 @@ const PromptABTesting: React.FC<PromptABTestingProps> = ({
   };
 
   const testPrompt = async (prompt: string): Promise<string> => {
-    const response = await fetch('https://toolkit.rork.com/text/llm/', {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    const apiKey = getActiveApiKey();
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(getApiEndpoint(), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         messages: [
           {
