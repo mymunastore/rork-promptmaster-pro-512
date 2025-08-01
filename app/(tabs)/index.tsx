@@ -38,127 +38,6 @@ export default function HomeScreen() {
     router.push('/(tabs)/templates');
   };
 
-  return (
-    <AnimatedBackground variant="cosmic">
-      <ScrollView 
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-        testID="home-screen"
-      >
-        <View style={styles.heroSection}>
-          <View style={styles.heroContent}>
-            <Wand2 size={48} color={theme.accent1} style={styles.heroIcon} />
-            <Text style={styles.heroTitle}>AI Prompt Studio</Text>
-            <Text style={styles.heroSubtitle}>
-              Create world-class AI prompts with professional templates, smart optimization, and advanced features
-            </Text>
-            <View style={styles.heroButtons}>
-              <Button 
-                title="Start Creating" 
-                onPress={navigateToNewPrompt}
-                variant="primary"
-                style={styles.primaryButton}
-                testID="create-prompt-button"
-              />
-              <Button 
-                title="Browse Templates" 
-                onPress={navigateToTemplates}
-                variant="outline"
-                style={styles.secondaryButton}
-                testID="browse-templates-button"
-              />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Powerful Features</Text>
-          <View style={styles.featuresGrid}>
-            <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '20' }]}>
-                <Brain size={28} color={theme.accent1} />
-              </View>
-              <Text style={styles.featureTitle}>Smart Templates</Text>
-              <Text style={styles.featureDescription}>
-                AI-powered templates for every industry and use case
-              </Text>
-            </Card>
-            
-            <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '20' }]}>
-                <Rocket size={28} color={theme.accent2} />
-              </View>
-              <Text style={styles.featureTitle}>Optimization</Text>
-              <Text style={styles.featureDescription}>
-                Real-time suggestions to maximize AI performance
-              </Text>
-            </Card>
-            
-            <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '20' }]}>
-                <Sparkles size={28} color={theme.accent3} />
-              </View>
-              <Text style={styles.featureTitle}>Advanced Tools</Text>
-              <Text style={styles.featureDescription}>
-                Keyword analysis, topic suggestions, and more
-              </Text>
-            </Card>
-            
-            <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '20' }]}>
-                <BookOpen size={28} color={theme.accent4} />
-              </View>
-              <Text style={styles.featureTitle}>Smart Library</Text>
-              <Text style={styles.featureDescription}>
-                Organize, search, and manage your prompt collection
-              </Text>
-            </Card>
-          </View>
-        </View>
-
-        <View style={styles.templatesSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Templates</Text>
-            <TouchableOpacity onPress={navigateToTemplates}>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <CategorySelector 
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            testID="category-selector"
-          />
-          
-          <View style={styles.templatesList}>
-            {featuredTemplates.map(template => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                onPress={handleTemplatePress}
-                testID={`template-card-${template.id}`}
-              />
-            ))}
-            
-            <TouchableOpacity 
-              style={styles.createNewCard}
-              onPress={navigateToNewPrompt}
-              testID="create-new-card"
-            >
-              <PlusCircle size={32} color={theme.primary} />
-              <Text style={styles.createNewText}>Create Custom Prompt</Text>
-              <Text style={styles.createNewDescription}>
-                Start from scratch with your own prompt
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </AnimatedBackground>
-  );
-}
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -300,3 +179,124 @@ export default function HomeScreen() {
       textAlign: 'center',
     },
   });
+
+  return (
+    <AnimatedBackground variant="cosmic">
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        testID="home-screen"
+      >
+        <View style={styles.heroSection}>
+          <View style={styles.heroContent}>
+            <Wand2 size={48} color={theme.accent1} style={styles.heroIcon} />
+            <Text style={styles.heroTitle}>AI Prompt Studio</Text>
+            <Text style={styles.heroSubtitle}>
+              Create world-class AI prompts with professional templates, smart optimization, and advanced features
+            </Text>
+            <View style={styles.heroButtons}>
+              <Button 
+                title="Start Creating" 
+                onPress={navigateToNewPrompt}
+                variant="primary"
+                style={styles.primaryButton}
+                testID="create-prompt-button"
+              />
+              <Button 
+                title="Browse Templates" 
+                onPress={navigateToTemplates}
+                variant="outline"
+                style={styles.secondaryButton}
+                testID="browse-templates-button"
+              />
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.featuresSection}>
+          <Text style={styles.sectionTitle}>Powerful Features</Text>
+          <View style={styles.featuresGrid}>
+            <Card style={styles.featureCard}>
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '20' }]}>
+                <Brain size={28} color={theme.accent1} />
+              </View>
+              <Text style={styles.featureTitle}>Smart Templates</Text>
+              <Text style={styles.featureDescription}>
+                AI-powered templates for every industry and use case
+              </Text>
+            </Card>
+            
+            <Card style={styles.featureCard}>
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '20' }]}>
+                <Rocket size={28} color={theme.accent2} />
+              </View>
+              <Text style={styles.featureTitle}>Optimization</Text>
+              <Text style={styles.featureDescription}>
+                Real-time suggestions to maximize AI performance
+              </Text>
+            </Card>
+            
+            <Card style={styles.featureCard}>
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '20' }]}>
+                <Sparkles size={28} color={theme.accent3} />
+              </View>
+              <Text style={styles.featureTitle}>Advanced Tools</Text>
+              <Text style={styles.featureDescription}>
+                Keyword analysis, topic suggestions, and more
+              </Text>
+            </Card>
+            
+            <Card style={styles.featureCard}>
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '20' }]}>
+                <BookOpen size={28} color={theme.accent4} />
+              </View>
+              <Text style={styles.featureTitle}>Smart Library</Text>
+              <Text style={styles.featureDescription}>
+                Organize, search, and manage your prompt collection
+              </Text>
+            </Card>
+          </View>
+        </View>
+
+        <View style={styles.templatesSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Featured Templates</Text>
+            <TouchableOpacity onPress={navigateToTemplates}>
+              <Text style={styles.viewAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <CategorySelector 
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            testID="category-selector"
+          />
+          
+          <View style={styles.templatesList}>
+            {featuredTemplates.map(template => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onPress={handleTemplatePress}
+                testID={`template-card-${template.id}`}
+              />
+            ))}
+            
+            <TouchableOpacity 
+              style={styles.createNewCard}
+              onPress={navigateToNewPrompt}
+              testID="create-new-card"
+            >
+              <PlusCircle size={32} color={theme.primary} />
+              <Text style={styles.createNewText}>Create Custom Prompt</Text>
+              <Text style={styles.createNewDescription}>
+                Start from scratch with your own prompt
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </AnimatedBackground>
+  );
+}

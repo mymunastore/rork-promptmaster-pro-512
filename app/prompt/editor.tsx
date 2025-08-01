@@ -186,6 +186,178 @@ export default function PromptEditorScreen() {
     </TouchableOpacity>
   );
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    contentContainer: {
+      padding: layout.spacing.lg,
+      paddingBottom: 100, // Extra padding for footer
+    },
+    section: {
+      marginBottom: layout.spacing.lg,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.sm,
+    },
+    titleInput: {
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.md,
+      padding: layout.spacing.md,
+      fontSize: 16,
+      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    categoriesContainer: {
+      flexDirection: 'row',
+      paddingVertical: layout.spacing.xs,
+    },
+    categoryButton: {
+      paddingHorizontal: layout.spacing.md,
+      paddingVertical: layout.spacing.sm,
+      borderRadius: layout.borderRadius.round,
+      backgroundColor: theme.background,
+      marginRight: layout.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    categoryButtonActive: {
+      backgroundColor: theme.primary,
+      borderColor: theme.primary,
+    },
+    categoryButtonText: {
+      color: theme.text,
+      fontWeight: '500' as const,
+    },
+    categoryButtonTextActive: {
+      color: theme.card,
+    },
+    contentInput: {
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.md,
+      padding: layout.spacing.md,
+      fontSize: 16,
+      color: theme.text,
+      minHeight: 200,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    tagsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: layout.spacing.sm,
+    },
+    tagInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    tagInput: {
+      backgroundColor: theme.card,
+      borderTopLeftRadius: layout.borderRadius.md,
+      borderBottomLeftRadius: layout.borderRadius.md,
+      padding: layout.spacing.sm,
+      paddingHorizontal: layout.spacing.md,
+      fontSize: 14,
+      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRightWidth: 0,
+      width: 120,
+    },
+    addTagButton: {
+      backgroundColor: theme.primary,
+      borderTopRightRadius: layout.borderRadius.md,
+      borderBottomRightRadius: layout.borderRadius.md,
+      padding: layout.spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    tag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.round,
+      paddingVertical: layout.spacing.xs,
+      paddingHorizontal: layout.spacing.md,
+      marginRight: layout.spacing.sm,
+      marginBottom: layout.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    tagIcon: {
+      marginRight: layout.spacing.xs,
+    },
+    tagText: {
+      fontSize: 14,
+      color: theme.text,
+      marginRight: layout.spacing.sm,
+    },
+    suggestionsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: layout.spacing.md,
+    },
+    suggestionsTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.primary,
+      marginLeft: layout.spacing.sm,
+    },
+    suggestionsCard: {
+      padding: layout.spacing.md,
+    },
+    suggestionsSubtitle: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.sm,
+    },
+    topicTitle: {
+      marginTop: layout.spacing.md,
+    },
+    keywordsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    topicsContainer: {
+      paddingBottom: layout.spacing.sm,
+    },
+    abTestingInputContainer: {
+      marginBottom: layout.spacing.md,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: theme.card,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
+      flexDirection: 'row',
+      padding: layout.spacing.md,
+    },
+    saveButton: {
+      flex: 1,
+      marginRight: layout.spacing.sm,
+    },
+    shareButton: {
+      width: 100,
+    },
+  });
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -423,175 +595,3 @@ export default function PromptEditorScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.background,
-    },
-    scrollContainer: {
-      flex: 1,
-    },
-    contentContainer: {
-      padding: layout.spacing.lg,
-      paddingBottom: 100, // Extra padding for footer
-    },
-    section: {
-      marginBottom: layout.spacing.lg,
-    },
-    label: {
-      fontSize: 16,
-      fontWeight: '600' as const,
-      color: theme.text,
-      marginBottom: layout.spacing.sm,
-    },
-    titleInput: {
-      backgroundColor: theme.card,
-      borderRadius: layout.borderRadius.md,
-      padding: layout.spacing.md,
-      fontSize: 16,
-      color: theme.text,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    categoriesContainer: {
-      flexDirection: 'row',
-      paddingVertical: layout.spacing.xs,
-    },
-    categoryButton: {
-      paddingHorizontal: layout.spacing.md,
-      paddingVertical: layout.spacing.sm,
-      borderRadius: layout.borderRadius.round,
-      backgroundColor: theme.background,
-      marginRight: layout.spacing.sm,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    categoryButtonActive: {
-      backgroundColor: theme.primary,
-      borderColor: theme.primary,
-    },
-    categoryButtonText: {
-      color: theme.text,
-      fontWeight: '500' as const,
-    },
-    categoryButtonTextActive: {
-      color: theme.card,
-    },
-    contentInput: {
-      backgroundColor: theme.card,
-      borderRadius: layout.borderRadius.md,
-      padding: layout.spacing.md,
-      fontSize: 16,
-      color: theme.text,
-      minHeight: 200,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    tagsHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: layout.spacing.sm,
-    },
-    tagInputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    tagInput: {
-      backgroundColor: theme.card,
-      borderTopLeftRadius: layout.borderRadius.md,
-      borderBottomLeftRadius: layout.borderRadius.md,
-      padding: layout.spacing.sm,
-      paddingHorizontal: layout.spacing.md,
-      fontSize: 14,
-      color: theme.text,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRightWidth: 0,
-      width: 120,
-    },
-    addTagButton: {
-      backgroundColor: theme.primary,
-      borderTopRightRadius: layout.borderRadius.md,
-      borderBottomRightRadius: layout.borderRadius.md,
-      padding: layout.spacing.sm,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    tagsContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-    },
-    tag: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.card,
-      borderRadius: layout.borderRadius.round,
-      paddingVertical: layout.spacing.xs,
-      paddingHorizontal: layout.spacing.md,
-      marginRight: layout.spacing.sm,
-      marginBottom: layout.spacing.sm,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    tagIcon: {
-      marginRight: layout.spacing.xs,
-    },
-    tagText: {
-      fontSize: 14,
-      color: theme.text,
-      marginRight: layout.spacing.sm,
-    },
-    suggestionsHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: layout.spacing.md,
-    },
-    suggestionsTitle: {
-      fontSize: 16,
-      fontWeight: '600' as const,
-      color: theme.primary,
-      marginLeft: layout.spacing.sm,
-    },
-    suggestionsCard: {
-      padding: layout.spacing.md,
-    },
-    suggestionsSubtitle: {
-      fontSize: 14,
-      fontWeight: '600' as const,
-      color: theme.text,
-      marginBottom: layout.spacing.sm,
-    },
-    topicTitle: {
-      marginTop: layout.spacing.md,
-    },
-    keywordsContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-    },
-    topicsContainer: {
-      paddingBottom: layout.spacing.sm,
-    },
-    abTestingInputContainer: {
-      marginBottom: layout.spacing.md,
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: theme.card,
-      borderTopWidth: 1,
-      borderTopColor: theme.border,
-      flexDirection: 'row',
-      padding: layout.spacing.md,
-    },
-    saveButton: {
-      flex: 1,
-      marginRight: layout.spacing.sm,
-    },
-    shareButton: {
-      width: 100,
-    },
-  });
