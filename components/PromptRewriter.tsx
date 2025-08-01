@@ -255,7 +255,7 @@ const PromptRewriter: React.FC<PromptRewriterProps> = ({
               onPress={copyToClipboard}
               variant="outline"
               style={styles.copyButton}
-              icon={copied ? Check : Copy}
+              icon={copied ? <Check size={16} color={theme.primary} /> : <Copy size={16} color={theme.primary} />}
               testID="copy-button"
             />
             <Button
