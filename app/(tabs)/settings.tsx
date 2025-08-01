@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, Switch, Alert, Linking, Platform, Share, Pressable } from 'react-native';
+import { router } from 'expo-router';
 import { 
   User, 
   Bell, 
@@ -65,11 +66,8 @@ export default function SettingsScreen() {
   };
   
   const handleProfilePress = () => {
-    Alert.alert(
-      'Profile',
-      'Profile management is coming soon! You\'ll be able to sync your prompts across devices.',
-      [{ text: 'OK' }]
-    );
+    router.push('/profile');
+    console.log('Navigating to profile screen');
   };
   
   const handleClearData = () => {
@@ -88,8 +86,20 @@ export default function SettingsScreen() {
           onPress: async () => {
             setIsLoading(true);
             try {
+              // Clear all AsyncStorage data
               await AsyncStorage.clear();
-              Alert.alert('Success', 'All data has been cleared successfully.');
+              
+              // Force a page reload to reset all app state
+              if (Platform.OS === 'web') {
+                window.location.reload();
+              } else {
+                // For mobile, we'll show success and the app will reset on next launch
+                Alert.alert(
+                  'Success', 
+                  'All data has been cleared successfully. Please restart the app to see changes.',
+                  [{ text: 'OK' }]
+                );
+              }
               console.log('All app data cleared');
             } catch (error) {
               console.error('Error clearing data:', error);
@@ -285,7 +295,7 @@ export default function SettingsScreen() {
             </View>
             <View style={styles.settingContent}>
               <Text style={[styles.settingTitle, { color: theme.text }]}>Profile</Text>
-              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Manage your account details</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Manage your account and personal details</Text>
             </View>
             <ChevronRight size={20} color={theme.textSecondary} />
           </Pressable>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import colors from '@/constants/colors';
 import layout from '@/constants/layout';
+import { useTheme } from '@/hooks/useTheme';
 
 interface ButtonProps {
   title: string;
@@ -29,9 +29,81 @@ const Button: React.FC<ButtonProps> = ({
   testID,
   icon,
 }) => {
+  const { theme } = useTheme();
+  
+  const styles = StyleSheet.create({
+    buttonContainer: {
+      borderRadius: layout.borderRadius.md,
+      overflow: 'hidden',
+    },
+    button: {
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+      borderRadius: layout.borderRadius.md,
+      flexDirection: 'row' as const,
+    },
+    smallButton: {
+      paddingVertical: layout.spacing.xs,
+      paddingHorizontal: layout.spacing.md,
+      minHeight: 32,
+    },
+    mediumButton: {
+      paddingVertical: layout.spacing.sm,
+      paddingHorizontal: layout.spacing.lg,
+      minHeight: 44,
+    },
+    largeButton: {
+      paddingVertical: layout.spacing.md,
+      paddingHorizontal: layout.spacing.xl,
+      minHeight: 52,
+    },
+    outlineButton: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: theme.primary,
+    },
+    textButton: {
+      backgroundColor: 'transparent',
+      paddingHorizontal: layout.spacing.xs,
+      minHeight: 'auto' as const,
+    },
+    disabledButton: {
+      opacity: 0.6,
+    },
+    text: {
+      color: theme.background,
+      fontWeight: '600' as const,
+      textAlign: 'center' as const,
+    },
+    smallText: {
+      fontSize: 12,
+    },
+    mediumText: {
+      fontSize: 14,
+    },
+    largeText: {
+      fontSize: 16,
+    },
+    outlineText: {
+      color: theme.primary,
+    },
+    textVariantText: {
+      color: theme.primary,
+    },
+    disabledText: {
+      color: theme.textSecondary,
+    },
+    textWithIcon: {
+      marginLeft: 8,
+    },
+    iconOnlyButton: {
+      paddingHorizontal: 12,
+    },
+  });
+  
   const getButtonContent = () => {
     if (loading) {
-      return <ActivityIndicator color={variant === 'outline' ? colors.primary : colors.card} />;
+      return <ActivityIndicator color={variant === 'outline' ? theme.primary : theme.background} />;
     }
     
     return (
@@ -65,7 +137,7 @@ const Button: React.FC<ButtonProps> = ({
         style={[styles.buttonContainer, style]}
       >
         <LinearGradient
-          colors={variant === 'primary' ? colors.gradient.primary : colors.gradient.secondary}
+          colors={variant === 'primary' ? [theme.primary, theme.primaryLight] : [theme.secondary, theme.accent2]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[
@@ -100,74 +172,5 @@ const Button: React.FC<ButtonProps> = ({
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  buttonContainer: {
-    borderRadius: layout.borderRadius.md,
-    overflow: 'hidden',
-  },
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: layout.borderRadius.md,
-  },
-  smallButton: {
-    paddingVertical: layout.spacing.xs,
-    paddingHorizontal: layout.spacing.md,
-    minHeight: 32,
-  },
-  mediumButton: {
-    paddingVertical: layout.spacing.sm,
-    paddingHorizontal: layout.spacing.lg,
-    minHeight: 44,
-  },
-  largeButton: {
-    paddingVertical: layout.spacing.md,
-    paddingHorizontal: layout.spacing.xl,
-    minHeight: 52,
-  },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  textButton: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: layout.spacing.xs,
-    minHeight: 'auto',
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  text: {
-    color: colors.card,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  smallText: {
-    fontSize: 12,
-  },
-  mediumText: {
-    fontSize: 14,
-  },
-  largeText: {
-    fontSize: 16,
-  },
-  outlineText: {
-    color: colors.primary,
-  },
-  textVariantText: {
-    color: colors.primary,
-  },
-  disabledText: {
-    color: colors.inactive,
-  },
-  textWithIcon: {
-    marginLeft: 8,
-  },
-  iconOnlyButton: {
-    paddingHorizontal: 12,
-  },
-});
 
 export default Button;

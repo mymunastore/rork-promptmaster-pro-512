@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SavedPrompt } from '@/types/prompt';
 import Card from './Card';
-import colors from '@/constants/colors';
 import layout from '@/constants/layout';
+import { useTheme } from '@/hooks/useTheme';
 import { Heart, Edit, Share2 } from 'lucide-react-native';
 
 interface SavedPromptCardProps {
@@ -21,10 +21,87 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({
   onShare,
   testID 
 }) => {
+  const { theme } = useTheme();
+  
   const formattedDate = new Date(prompt.updatedAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+  });
+
+  const styles = StyleSheet.create({
+    card: {
+      marginBottom: layout.spacing.md,
+    },
+    contentContainer: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row' as const,
+      justifyContent: 'space-between' as const,
+      alignItems: 'center' as const,
+      marginBottom: layout.spacing.xs,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.text,
+      flex: 1,
+    },
+    date: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      marginLeft: layout.spacing.sm,
+    },
+    content: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      marginBottom: layout.spacing.sm,
+    },
+    tagsContainer: {
+      flexDirection: 'row' as const,
+      flexWrap: 'wrap' as const,
+      marginBottom: layout.spacing.sm,
+    },
+    categoryTag: {
+      backgroundColor: theme.primaryLight,
+      paddingHorizontal: layout.spacing.sm,
+      paddingVertical: layout.spacing.xs / 2,
+      borderRadius: layout.borderRadius.sm,
+      marginRight: layout.spacing.xs,
+      marginBottom: layout.spacing.xs,
+    },
+    categoryText: {
+      color: theme.background,
+      fontSize: 12,
+      fontWeight: '500' as const,
+    },
+    tag: {
+      backgroundColor: theme.background,
+      paddingHorizontal: layout.spacing.sm,
+      paddingVertical: layout.spacing.xs / 2,
+      borderRadius: layout.borderRadius.sm,
+      marginRight: layout.spacing.xs,
+      marginBottom: layout.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    tagText: {
+      color: theme.textSecondary,
+      fontSize: 12,
+    },
+    actions: {
+      flexDirection: 'row' as const,
+      justifyContent: 'flex-end' as const,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
+      paddingTop: layout.spacing.sm,
+      marginTop: layout.spacing.xs,
+    },
+    actionButton: {
+      padding: layout.spacing.xs,
+      marginLeft: layout.spacing.sm,
+    },
   });
 
   return (
@@ -59,103 +136,33 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => onToggleFavorite(prompt.id, !prompt.isFavorite)}
+          testID={`favorite-button-${prompt.id}`}
         >
           <Heart 
             size={20} 
-            color={prompt.isFavorite ? colors.error : colors.textSecondary}
-            fill={prompt.isFavorite ? colors.error : 'transparent'}
+            color={prompt.isFavorite ? theme.error : theme.textSecondary}
+            fill={prompt.isFavorite ? theme.error : 'transparent'}
           />
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => onPress(prompt)}
+          testID={`edit-button-${prompt.id}`}
         >
-          <Edit size={20} color={colors.textSecondary} />
+          <Edit size={20} color={theme.textSecondary} />
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => onShare(prompt)}
+          testID={`share-button-${prompt.id}`}
         >
-          <Share2 size={20} color={colors.textSecondary} />
+          <Share2 size={20} color={theme.textSecondary} />
         </TouchableOpacity>
       </View>
     </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    marginBottom: layout.spacing.md,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: layout.spacing.xs,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    flex: 1,
-  },
-  date: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginLeft: layout.spacing.sm,
-  },
-  content: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: layout.spacing.sm,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: layout.spacing.sm,
-  },
-  categoryTag: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: layout.spacing.sm,
-    paddingVertical: layout.spacing.xs / 2,
-    borderRadius: layout.borderRadius.sm,
-    marginRight: layout.spacing.xs,
-    marginBottom: layout.spacing.xs,
-  },
-  categoryText: {
-    color: colors.card,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  tag: {
-    backgroundColor: colors.background,
-    paddingHorizontal: layout.spacing.sm,
-    paddingVertical: layout.spacing.xs / 2,
-    borderRadius: layout.borderRadius.sm,
-    marginRight: layout.spacing.xs,
-    marginBottom: layout.spacing.xs,
-  },
-  tagText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: layout.spacing.sm,
-    marginTop: layout.spacing.xs,
-  },
-  actionButton: {
-    padding: layout.spacing.xs,
-    marginLeft: layout.spacing.sm,
-  },
-});
 
 export default SavedPromptCard;
