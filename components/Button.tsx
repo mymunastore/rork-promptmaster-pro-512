@@ -35,8 +35,8 @@ const Button: React.FC<ButtonProps> = ({
   
   const handlePress = async () => {
     if (hapticFeedback && Platform.OS !== 'web') {
-      const Haptics = await import('expo-haptics');
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const { impactAsync, ImpactFeedbackStyle } = await import('expo-haptics');
+      await impactAsync(ImpactFeedbackStyle.Light);
     }
     onPress();
   };
