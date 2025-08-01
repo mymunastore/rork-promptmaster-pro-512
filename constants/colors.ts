@@ -1,0 +1,35 @@
+const colors = {
+  primary: "#6200EE",
+  primaryLight: "#BB86FC",
+  secondary: "#03DAC6",
+  background: "#0F0F23",
+  backgroundLight: "#1A1A2E",
+  backgroundAccent: "#16213E",
+  card: "#FFFFFF",
+  cardDark: "#1E1E3F",
+  text: "#FFFFFF",
+  textSecondary: "#A0A0B8",
+  textDark: "#333333",
+  border: "#2A2A4A",
+  borderLight: "#E1E4E8",
+  error: "#FF6B6B",
+  success: "#4ECDC4",
+  warning: "#FFE66D",
+  inactive: "#6C6C8A",
+  accent1: "#FF6B9D",
+  accent2: "#4ECDC4",
+  accent3: "#45B7D1",
+  accent4: "#96CEB4",
+  accent5: "#FFEAA7",
+  gradient: {
+    primary: ["#6200EE", "#9D4EDD"] as const,
+    secondary: ["#03DAC6", "#018786"] as const,
+    background: ["#0F0F23", "#1A1A2E", "#16213E"] as const,
+    cosmic: ["#667eea", "#764ba2", "#f093fb"] as const,
+    aurora: ["#4facfe", "#00f2fe", "#43e97b"] as const,
+    sunset: ["#fa709a", "#fee140", "#ffeaa7"] as const,
+    ocean: ["#2196F3", "#21CBF3", "#4ECDC4"] as const,
+  }
+};
+
+export default colors;
