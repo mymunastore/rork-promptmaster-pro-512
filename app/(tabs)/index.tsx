@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { PlusCircle, Sparkles, BookOpen, Wand2, Brain, Rocket } from 'lucide-react-native';
-import colors from '@/constants/colors';
+import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
@@ -14,6 +14,7 @@ import templates from '@/mocks/templates';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<PromptCategory | null>(null);
 
   const filteredTemplates = selectedCategory 
@@ -47,7 +48,7 @@ export default function HomeScreen() {
       >
         <View style={styles.heroSection}>
           <View style={styles.heroContent}>
-            <Wand2 size={48} color={colors.accent1} style={styles.heroIcon} />
+            <Wand2 size={48} color={theme.accent1} style={styles.heroIcon} />
             <Text style={styles.heroTitle}>AI Prompt Studio</Text>
             <Text style={styles.heroSubtitle}>
               Create world-class AI prompts with professional templates, smart optimization, and advanced features
@@ -75,8 +76,8 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Powerful Features</Text>
           <View style={styles.featuresGrid}>
             <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: colors.accent1 + '20' }]}>
-                <Brain size={28} color={colors.accent1} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent1 + '20' }]}>
+                <Brain size={28} color={theme.accent1} />
               </View>
               <Text style={styles.featureTitle}>Smart Templates</Text>
               <Text style={styles.featureDescription}>
@@ -85,8 +86,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: colors.accent2 + '20' }]}>
-                <Rocket size={28} color={colors.accent2} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent2 + '20' }]}>
+                <Rocket size={28} color={theme.accent2} />
               </View>
               <Text style={styles.featureTitle}>Optimization</Text>
               <Text style={styles.featureDescription}>
@@ -95,8 +96,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: colors.accent3 + '20' }]}>
-                <Sparkles size={28} color={colors.accent3} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent3 + '20' }]}>
+                <Sparkles size={28} color={theme.accent3} />
               </View>
               <Text style={styles.featureTitle}>Advanced Tools</Text>
               <Text style={styles.featureDescription}>
@@ -105,8 +106,8 @@ export default function HomeScreen() {
             </Card>
             
             <Card style={styles.featureCard}>
-              <View style={[styles.featureIconContainer, { backgroundColor: colors.accent4 + '20' }]}>
-                <BookOpen size={28} color={colors.accent4} />
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.accent4 + '20' }]}>
+                <BookOpen size={28} color={theme.accent4} />
               </View>
               <Text style={styles.featureTitle}>Smart Library</Text>
               <Text style={styles.featureDescription}>
@@ -145,7 +146,7 @@ export default function HomeScreen() {
               onPress={navigateToNewPrompt}
               testID="create-new-card"
             >
-              <PlusCircle size={32} color={colors.primary} />
+              <PlusCircle size={32} color={theme.primary} />
               <Text style={styles.createNewText}>Create Custom Prompt</Text>
               <Text style={styles.createNewDescription}>
                 Start from scratch with your own prompt
@@ -158,144 +159,144 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  contentContainer: {
-    paddingBottom: layout.spacing.xxl,
-  },
-  heroSection: {
-    paddingTop: layout.spacing.xxl,
-    paddingBottom: layout.spacing.xl,
-    paddingHorizontal: layout.spacing.lg,
-    alignItems: 'center',
-  },
-  heroContent: {
-    alignItems: 'center',
-    maxWidth: 400,
-  },
-  heroIcon: {
-    marginBottom: layout.spacing.md,
-  },
-  heroTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: layout.spacing.sm,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: layout.spacing.xl,
-    lineHeight: 24,
-  },
-  heroButtons: {
-    flexDirection: 'row',
-    gap: layout.spacing.md,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  primaryButton: {
-    minWidth: 140,
-  },
-  secondaryButton: {
-    minWidth: 140,
-  },
-  featuresSection: {
-    padding: layout.spacing.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    marginHorizontal: layout.spacing.lg,
-    borderRadius: layout.borderRadius.xl,
-    marginBottom: layout.spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: layout.spacing.lg,
-    textAlign: 'center',
-  },
-  featuresGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  featureCard: {
-    width: '48%',
-    marginBottom: layout.spacing.lg,
-    alignItems: 'center',
-    padding: layout.spacing.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: layout.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  featureIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: layout.borderRadius.round,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: layout.spacing.md,
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: layout.spacing.sm,
-    textAlign: 'center',
-  },
-  featureDescription: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  templatesSection: {
-    paddingHorizontal: layout.spacing.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    marginHorizontal: layout.spacing.lg,
-    borderRadius: layout.borderRadius.xl,
-    paddingVertical: layout.spacing.lg,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: layout.spacing.lg,
-  },
-  viewAllText: {
-    fontSize: 14,
-    color: colors.accent1,
-    fontWeight: '600',
-  },
-  templatesList: {
-    marginTop: layout.spacing.sm,
-  },
-  createNewCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: layout.borderRadius.lg,
-    padding: layout.spacing.lg,
-    marginBottom: layout.spacing.md,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.primary + '40',
-    borderStyle: 'dashed',
-  },
-  createNewText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginTop: layout.spacing.md,
-    marginBottom: layout.spacing.xs,
-  },
-  createNewDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    contentContainer: {
+      paddingBottom: layout.spacing.xxl,
+    },
+    heroSection: {
+      paddingTop: layout.spacing.xxl,
+      paddingBottom: layout.spacing.xl,
+      paddingHorizontal: layout.spacing.lg,
+      alignItems: 'center',
+    },
+    heroContent: {
+      alignItems: 'center',
+      maxWidth: 400,
+    },
+    heroIcon: {
+      marginBottom: layout.spacing.md,
+    },
+    heroTitle: {
+      fontSize: 32,
+      fontWeight: '800' as const,
+      color: theme.text,
+      textAlign: 'center',
+      marginBottom: layout.spacing.sm,
+    },
+    heroSubtitle: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      marginBottom: layout.spacing.xl,
+      lineHeight: 24,
+    },
+    heroButtons: {
+      flexDirection: 'row',
+      gap: layout.spacing.md,
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+    primaryButton: {
+      minWidth: 140,
+    },
+    secondaryButton: {
+      minWidth: 140,
+    },
+    featuresSection: {
+      padding: layout.spacing.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      marginHorizontal: layout.spacing.lg,
+      borderRadius: layout.borderRadius.xl,
+      marginBottom: layout.spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: 24,
+      fontWeight: '700' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.lg,
+      textAlign: 'center',
+    },
+    featuresGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    featureCard: {
+      width: '48%',
+      marginBottom: layout.spacing.lg,
+      alignItems: 'center',
+      padding: layout.spacing.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      borderRadius: layout.borderRadius.lg,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    featureIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: layout.borderRadius.round,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: layout.spacing.md,
+    },
+    featureTitle: {
+      fontSize: 16,
+      fontWeight: '700' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.sm,
+      textAlign: 'center',
+    },
+    featureDescription: {
+      fontSize: 13,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    templatesSection: {
+      paddingHorizontal: layout.spacing.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+      marginHorizontal: layout.spacing.lg,
+      borderRadius: layout.borderRadius.xl,
+      paddingVertical: layout.spacing.lg,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: layout.spacing.lg,
+    },
+    viewAllText: {
+      fontSize: 14,
+      color: theme.accent1,
+      fontWeight: '600' as const,
+    },
+    templatesList: {
+      marginTop: layout.spacing.sm,
+    },
+    createNewCard: {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      borderRadius: layout.borderRadius.lg,
+      padding: layout.spacing.lg,
+      marginBottom: layout.spacing.md,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: theme.primary + '40',
+      borderStyle: 'dashed',
+    },
+    createNewText: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginTop: layout.spacing.md,
+      marginBottom: layout.spacing.xs,
+    },
+    createNewDescription: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textAlign: 'center',
+    },
+  });

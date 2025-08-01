@@ -37,3 +37,30 @@ export interface TopicSuggestion {
   topic: string;
   description: string;
 }
+
+export interface CommunityTemplate extends PromptTemplate {
+  author: string;
+  authorId: string;
+  rating: number;
+  downloads: number;
+  isVerified: boolean;
+  publishedAt: string;
+  updatedAt: string;
+}
+
+export interface PromptRating {
+  id: string;
+  templateId: string;
+  userId: string;
+  rating: number;
+  review?: string;
+  createdAt: string;
+}
+
+export interface PromptUsageStats {
+  templateId: string;
+  totalUses: number;
+  successRate: number;
+  avgRating: number;
+  trendingScore: number;
+}

@@ -18,12 +18,15 @@ import {
   X,
   Plus
 } from 'lucide-react-native';
-import colors from '@/constants/colors';
+import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import KeywordSuggestionChip from '@/components/KeywordSuggestionChip';
 import TopicSuggestionCard from '@/components/TopicSuggestionCard';
+import PromptAnalytics from '@/components/PromptAnalytics';
+import PromptRewriter from '@/components/PromptRewriter';
+import PromptABTesting from '@/components/PromptABTesting';
 import { PromptCategory, TopicSuggestion } from '@/types/prompt';
 import { usePromptStore } from '@/hooks/usePromptStore';
 import templates from '@/mocks/templates';
@@ -31,6 +34,7 @@ import { keywordSuggestions, topicSuggestions } from '@/mocks/keywords';
 
 export default function PromptEditorScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { templateId, promptId } = useLocalSearchParams<{ templateId?: string; promptId?: string }>();
   const { savePrompt, updatePrompt, getPromptById } = usePromptStore();
 
@@ -41,6 +45,10 @@ export default function PromptEditorScreen() {
   const [newTag, setNewTag] = useState<string>('');
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
+  const [showRewriter, setShowRewriter] = useState<boolean>(false);
+  const [showABTesting, setShowABTesting] = useState<boolean>(false);
+  const [promptB, setPromptB] = useState<string>('');
 
   // Initialize from template or saved prompt
   useEffect(() => {
@@ -146,6 +154,19 @@ export default function PromptEditorScreen() {
     });
   };
 
+  const handleRewrittenPrompt = (rewrittenPrompt: string) => {
+    setContent(rewrittenPrompt);
+  };
+
+  const handleABTestComplete = (winner: 'A' | 'B', results: any) => {
+    console.log('A/B Test completed:', { winner, results });
+    Alert.alert(
+      'A/B Test Complete',
+      `Prompt ${winner} performed better with a score of ${winner === 'A' ? results.promptA.score : results.promptB.score}!`,
+      [{ text: 'OK' }]
+    );
+  };
+
   const renderCategoryButton = (categoryId: PromptCategory, label: string) => (
     <TouchableOpacity
       style={[
@@ -184,7 +205,7 @@ export default function PromptEditorScreen() {
             value={title}
             onChangeText={setTitle}
             placeholder="Enter prompt title..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={theme.textSecondary}
             testID="title-input"
           />
         </View>
@@ -213,7 +234,7 @@ export default function PromptEditorScreen() {
             value={content}
             onChangeText={setContent}
             placeholder="Write your prompt here..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={theme.textSecondary}
             multiline
             textAlignVertical="top"
             testID="content-input"
@@ -229,7 +250,7 @@ export default function PromptEditorScreen() {
                 value={newTag}
                 onChangeText={setNewTag}
                 placeholder="Add tag..."
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={theme.textSecondary}
                 onSubmitEditing={handleAddTag}
                 testID="tag-input"
               />
@@ -238,20 +259,20 @@ export default function PromptEditorScreen() {
                 onPress={handleAddTag}
                 testID="add-tag-button"
               >
-                <Plus size={20} color={colors.card} />
+                <Plus size={20} color={theme.card} />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.tagsContainer}>
             {tags.map((tag, index) => (
               <View key={index} style={styles.tag}>
-                <Tag size={14} color={colors.text} style={styles.tagIcon} />
+                <Tag size={14} color={theme.text} style={styles.tagIcon} />
                 <Text style={styles.tagText}>{tag}</Text>
                 <TouchableOpacity
                   onPress={() => handleRemoveTag(tag)}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <X size={14} color={colors.text} />
+                  <X size={14} color={theme.text} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -264,7 +285,7 @@ export default function PromptEditorScreen() {
             onPress={() => setShowSuggestions(!showSuggestions)}
             testID="toggle-suggestions-button"
           >
-            <Sparkles size={20} color={colors.primary} />
+            <Sparkles size={20} color={theme.primary} />
             <Text style={styles.suggestionsTitle}>
               {showSuggestions ? 'Hide Suggestions' : 'Show Optimization Suggestions'}
             </Text>
@@ -302,6 +323,85 @@ export default function PromptEditorScreen() {
             </Card>
           )}
         </View>
+
+        {/* Analytics Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowAnalytics(!showAnalytics)}
+            testID="toggle-analytics-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showAnalytics ? 'Hide Analytics' : 'Show Prompt Analytics'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showAnalytics && (
+            <PromptAnalytics 
+              content={content}
+              testID="prompt-analytics"
+            />
+          )}
+        </View>
+
+        {/* AI Rewriter Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowRewriter(!showRewriter)}
+            testID="toggle-rewriter-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showRewriter ? 'Hide AI Rewriter' : 'Show AI Rewriter'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showRewriter && (
+            <PromptRewriter 
+              originalPrompt={content}
+              onRewrittenPrompt={handleRewrittenPrompt}
+              testID="prompt-rewriter"
+            />
+          )}
+        </View>
+
+        {/* A/B Testing Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowABTesting(!showABTesting)}
+            testID="toggle-ab-testing-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showABTesting ? 'Hide A/B Testing' : 'Show A/B Testing'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showABTesting && (
+            <View>
+              <View style={styles.abTestingInputContainer}>
+                <Text style={styles.label}>Prompt B (for comparison)</Text>
+                <TextInput
+                  style={styles.contentInput}
+                  value={promptB}
+                  onChangeText={setPromptB}
+                  placeholder="Enter alternative prompt for A/B testing..."
+                  placeholderTextColor={theme.textSecondary}
+                  multiline
+                  textAlignVertical="top"
+                  testID="prompt-b-input"
+                />
+              </View>
+              
+              <PromptABTesting 
+                promptA={content}
+                promptB={promptB}
+                onTestComplete={handleABTestComplete}
+                testID="prompt-ab-testing"
+              />
+            </View>
+          )}
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -324,171 +424,174 @@ export default function PromptEditorScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: layout.spacing.lg,
-    paddingBottom: 100, // Extra padding for footer
-  },
-  section: {
-    marginBottom: layout.spacing.lg,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: layout.spacing.sm,
-  },
-  titleInput: {
-    backgroundColor: colors.card,
-    borderRadius: layout.borderRadius.md,
-    padding: layout.spacing.md,
-    fontSize: 16,
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  categoriesContainer: {
-    flexDirection: 'row',
-    paddingVertical: layout.spacing.xs,
-  },
-  categoryButton: {
-    paddingHorizontal: layout.spacing.md,
-    paddingVertical: layout.spacing.sm,
-    borderRadius: layout.borderRadius.round,
-    backgroundColor: colors.background,
-    marginRight: layout.spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  categoryButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryButtonText: {
-    color: colors.text,
-    fontWeight: '500',
-  },
-  categoryButtonTextActive: {
-    color: colors.card,
-  },
-  contentInput: {
-    backgroundColor: colors.card,
-    borderRadius: layout.borderRadius.md,
-    padding: layout.spacing.md,
-    fontSize: 16,
-    color: colors.text,
-    minHeight: 200,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tagsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: layout.spacing.sm,
-  },
-  tagInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  tagInput: {
-    backgroundColor: colors.card,
-    borderTopLeftRadius: layout.borderRadius.md,
-    borderBottomLeftRadius: layout.borderRadius.md,
-    padding: layout.spacing.sm,
-    paddingHorizontal: layout.spacing.md,
-    fontSize: 14,
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRightWidth: 0,
-    width: 120,
-  },
-  addTagButton: {
-    backgroundColor: colors.primary,
-    borderTopRightRadius: layout.borderRadius.md,
-    borderBottomRightRadius: layout.borderRadius.md,
-    padding: layout.spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: layout.borderRadius.round,
-    paddingVertical: layout.spacing.xs,
-    paddingHorizontal: layout.spacing.md,
-    marginRight: layout.spacing.sm,
-    marginBottom: layout.spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tagIcon: {
-    marginRight: layout.spacing.xs,
-  },
-  tagText: {
-    fontSize: 14,
-    color: colors.text,
-    marginRight: layout.spacing.sm,
-  },
-  suggestionsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: layout.spacing.md,
-  },
-  suggestionsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.primary,
-    marginLeft: layout.spacing.sm,
-  },
-  suggestionsCard: {
-    padding: layout.spacing.md,
-  },
-  suggestionsSubtitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: layout.spacing.sm,
-  },
-  topicTitle: {
-    marginTop: layout.spacing.md,
-  },
-  keywordsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  topicsContainer: {
-    paddingBottom: layout.spacing.sm,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.card,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    flexDirection: 'row',
-    padding: layout.spacing.md,
-  },
-  saveButton: {
-    flex: 1,
-    marginRight: layout.spacing.sm,
-  },
-  shareButton: {
-    width: 100,
-  },
-});
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    contentContainer: {
+      padding: layout.spacing.lg,
+      paddingBottom: 100, // Extra padding for footer
+    },
+    section: {
+      marginBottom: layout.spacing.lg,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.sm,
+    },
+    titleInput: {
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.md,
+      padding: layout.spacing.md,
+      fontSize: 16,
+      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    categoriesContainer: {
+      flexDirection: 'row',
+      paddingVertical: layout.spacing.xs,
+    },
+    categoryButton: {
+      paddingHorizontal: layout.spacing.md,
+      paddingVertical: layout.spacing.sm,
+      borderRadius: layout.borderRadius.round,
+      backgroundColor: theme.background,
+      marginRight: layout.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    categoryButtonActive: {
+      backgroundColor: theme.primary,
+      borderColor: theme.primary,
+    },
+    categoryButtonText: {
+      color: theme.text,
+      fontWeight: '500' as const,
+    },
+    categoryButtonTextActive: {
+      color: theme.card,
+    },
+    contentInput: {
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.md,
+      padding: layout.spacing.md,
+      fontSize: 16,
+      color: theme.text,
+      minHeight: 200,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    tagsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: layout.spacing.sm,
+    },
+    tagInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    tagInput: {
+      backgroundColor: theme.card,
+      borderTopLeftRadius: layout.borderRadius.md,
+      borderBottomLeftRadius: layout.borderRadius.md,
+      padding: layout.spacing.sm,
+      paddingHorizontal: layout.spacing.md,
+      fontSize: 14,
+      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRightWidth: 0,
+      width: 120,
+    },
+    addTagButton: {
+      backgroundColor: theme.primary,
+      borderTopRightRadius: layout.borderRadius.md,
+      borderBottomRightRadius: layout.borderRadius.md,
+      padding: layout.spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tagsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    tag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.round,
+      paddingVertical: layout.spacing.xs,
+      paddingHorizontal: layout.spacing.md,
+      marginRight: layout.spacing.sm,
+      marginBottom: layout.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    tagIcon: {
+      marginRight: layout.spacing.xs,
+    },
+    tagText: {
+      fontSize: 14,
+      color: theme.text,
+      marginRight: layout.spacing.sm,
+    },
+    suggestionsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: layout.spacing.md,
+    },
+    suggestionsTitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: theme.primary,
+      marginLeft: layout.spacing.sm,
+    },
+    suggestionsCard: {
+      padding: layout.spacing.md,
+    },
+    suggestionsSubtitle: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      color: theme.text,
+      marginBottom: layout.spacing.sm,
+    },
+    topicTitle: {
+      marginTop: layout.spacing.md,
+    },
+    keywordsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    topicsContainer: {
+      paddingBottom: layout.spacing.sm,
+    },
+    abTestingInputContainer: {
+      marginBottom: layout.spacing.md,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: theme.card,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
+      flexDirection: 'row',
+      padding: layout.spacing.md,
+    },
+    saveButton: {
+      flex: 1,
+      marginRight: layout.spacing.sm,
+    },
+    shareButton: {
+      width: 100,
+    },
+  });
