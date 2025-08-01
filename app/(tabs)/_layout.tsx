@@ -62,7 +62,7 @@ export default function TabLayout() {
           fontWeight: layout.typography.weights.semibold,
           fontSize: layout.typography.sizes.headline,
         },
-        headerBackTitleVisible: false,
+
       }}
     >
       <Tabs.Screen
