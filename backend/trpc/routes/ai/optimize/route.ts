@@ -9,7 +9,7 @@ const optimizePromptSchema = z.object({
 
 export const optimizePromptProcedure = protectedProcedure
   .input(optimizePromptSchema)
-  .mutation(async ({ input }: { input: z.infer<typeof optimizePromptSchema> }) => {
+  .mutation(async ({ input }) => {
     try {
       // Call AI optimization service
       const response = await fetch('https://toolkit.rork.com/text/llm/', {

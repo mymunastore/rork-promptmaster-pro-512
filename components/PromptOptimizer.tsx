@@ -26,10 +26,10 @@ const PromptOptimizer: React.FC<PromptOptimizerProps> = ({
   const [optimizationResult, setOptimizationResult] = useState<any>(null);
 
   const optimizePromptMutation = trpc.ai.optimize.useMutation({
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       setOptimizationResult(data);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.error('Error optimizing prompt:', error);
       Alert.alert('Error', 'Failed to optimize prompt. Please try again.');
     },

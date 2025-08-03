@@ -19,4 +19,6 @@ const t = initTRPC.context<Context>().create({
 
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
-export const protectedProcedure = t.procedure; // In a real app, add auth middleware here
+// For now, protectedProcedure is the same as publicProcedure
+// In a real app, add auth middleware here
+export const protectedProcedure = t.procedure;

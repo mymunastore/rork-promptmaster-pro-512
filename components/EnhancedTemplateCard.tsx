@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Star, Clock, Users, TrendingUp, Eye } from 'lucide-react-native';
+import { Star, Clock, TrendingUp, Eye } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';

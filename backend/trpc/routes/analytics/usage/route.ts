@@ -8,7 +8,7 @@ const usageAnalyticsSchema = z.object({
 
 export const usageAnalyticsProcedure = protectedProcedure
   .input(usageAnalyticsSchema)
-  .query(async ({ input }: { input: z.infer<typeof usageAnalyticsSchema> }) => {
+  .query(async ({ input }) => {
     // Mock analytics data
     const generateMockData = (days: number) => {
       const data = [];
@@ -37,7 +37,8 @@ export const usageAnalyticsProcedure = protectedProcedure
       year: 365,
     };
 
-    const dailyData = generateMockData(timeframeDays[input.timeframe as keyof typeof timeframeDays]);
+    const days = timeframeDays[input.timeframe];
+    const dailyData = generateMockData(days);
     
     // Calculate totals
     const totals = dailyData.reduce(

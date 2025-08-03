@@ -11,7 +11,7 @@ const listTemplatesSchema = z.object({
 
 export const listTemplatesProcedure = protectedProcedure
   .input(listTemplatesSchema)
-  .query(async ({ input }: { input: z.infer<typeof listTemplatesSchema> }) => {
+  .query(async ({ input }) => {
     // Mock templates data
     const mockTemplates = [
       {

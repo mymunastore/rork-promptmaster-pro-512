@@ -14,7 +14,7 @@ const listPromptsSchema = z.object({
 
 export const listPromptsProcedure = protectedProcedure
   .input(listPromptsSchema)
-  .query(async ({ input }: { input: z.infer<typeof listPromptsSchema> }) => {
+  .query(async ({ input }) => {
     // Mock data - in a real app, this would query a database
     const mockPrompts = [
       {

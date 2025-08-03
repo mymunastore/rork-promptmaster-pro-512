@@ -13,7 +13,7 @@ const createPromptSchema = z.object({
 
 export const createPromptProcedure = protectedProcedure
   .input(createPromptSchema)
-  .mutation(async ({ input }: { input: z.infer<typeof createPromptSchema> }) => {
+  .mutation(async ({ input }) => {
     const now = new Date().toISOString();
     const id = Date.now().toString(36) + Math.random().toString(36).substring(2);
     

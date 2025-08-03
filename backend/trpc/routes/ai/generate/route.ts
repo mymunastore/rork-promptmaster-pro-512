@@ -11,7 +11,7 @@ const generatePromptSchema = z.object({
 
 export const generatePromptProcedure = protectedProcedure
   .input(generatePromptSchema)
-  .mutation(async ({ input }: { input: z.infer<typeof generatePromptSchema> }) => {
+  .mutation(async ({ input }) => {
     try {
       const keywordsText = input.keywords.length > 0 ? `\nKeywords to include: ${input.keywords.join(', ')}` : '';
       

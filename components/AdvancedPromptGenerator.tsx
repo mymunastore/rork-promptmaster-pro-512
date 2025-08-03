@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { Wand2, Sparkles, Target, Zap, RefreshCw } from 'lucide-react-native';
+import { Wand2, RefreshCw } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
@@ -27,10 +27,10 @@ const AdvancedPromptGenerator: React.FC<AdvancedPromptGeneratorProps> = ({
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
 
   const generatePromptMutation = trpc.ai.generate.useMutation({
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       setGeneratedPrompt(data.prompt);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.error('Error generating prompt:', error);
       Alert.alert('Error', 'Failed to generate prompt. Please try again.');
     },

@@ -86,7 +86,7 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
   useEffect(() => {
     if (syncEnabled && serverPromptsQuery.data) {
       // Merge server prompts with local prompts
-      const serverPrompts = serverPromptsQuery.data.prompts.map((p: any) => ({
+      const serverPrompts = serverPromptsQuery.data.prompts.map((p) => ({
         id: p.id,
         title: p.title,
         content: p.content,

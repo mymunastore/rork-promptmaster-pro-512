@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { BarChart3, TrendingUp, Eye, Heart, Share2, Calendar, Filter } from 'lucide-react-native';
+import { BarChart3, TrendingUp, Eye, Heart, Share2, Filter } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Card from '@/components/Card';
@@ -375,7 +375,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ testID }) => {
 
         <View style={styles.categoryBreakdown}>
           <Text style={styles.categoryTitle}>Category Breakdown</Text>
-          {data.categoryBreakdown.map((category: any, index: number) => (
+          {data.categoryBreakdown.map((category, index) => (
             <View key={index} style={styles.categoryItem}>
               <Text style={styles.categoryName}>{category.category}</Text>
               <View style={styles.categoryStats}>
@@ -388,7 +388,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ testID }) => {
 
         <View style={styles.insightsContainer}>
           <Text style={styles.insightsTitle}>Key Insights</Text>
-          {data.insights.map((insight: string, index: number) => (
+          {data.insights.map((insight, index) => (
             <View key={index} style={styles.insightItem}>
               <View style={styles.insightBullet} />
               <Text style={styles.insightText}>{insight}</Text>
