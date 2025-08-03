@@ -8,11 +8,11 @@ const analyzePromptSchema = z.object({
 
 export const analyzePromptProcedure = protectedProcedure
   .input(analyzePromptSchema)
-  .query(async ({ input }) => {
+  .query(async ({ input }: { input: z.infer<typeof analyzePromptSchema> }) => {
     // Mock analysis - in a real app, this would use AI to analyze the prompt
     const wordCount = input.prompt.split(/\s+/).length;
     const charCount = input.prompt.length;
-    const sentenceCount = input.prompt.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+    const sentenceCount = input.prompt.split(/[.!?]+/).filter((s: string) => s.trim().length > 0).length;
     
     // Mock complexity analysis
     const complexity = wordCount > 100 ? 'High' : wordCount > 50 ? 'Medium' : 'Low';
@@ -24,7 +24,7 @@ export const analyzePromptProcedure = protectedProcedure
     const keywords = input.prompt
       .toLowerCase()
       .split(/\W+/)
-      .filter(word => word.length > 3)
+      .filter((word: string) => word.length > 3)
       .slice(0, 10);
     
     // Mock sentiment analysis

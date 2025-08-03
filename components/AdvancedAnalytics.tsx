@@ -375,7 +375,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ testID }) => {
 
         <View style={styles.categoryBreakdown}>
           <Text style={styles.categoryTitle}>Category Breakdown</Text>
-          {data.categoryBreakdown.map((category, index) => (
+          {data.categoryBreakdown.map((category: any, index: number) => (
             <View key={index} style={styles.categoryItem}>
               <Text style={styles.categoryName}>{category.category}</Text>
               <View style={styles.categoryStats}>
@@ -388,7 +388,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ testID }) => {
 
         <View style={styles.insightsContainer}>
           <Text style={styles.insightsTitle}>Key Insights</Text>
-          {data.insights.map((insight, index) => (
+          {data.insights.map((insight: string, index: number) => (
             <View key={index} style={styles.insightItem}>
               <View style={styles.insightBullet} />
               <Text style={styles.insightText}>{insight}</Text>

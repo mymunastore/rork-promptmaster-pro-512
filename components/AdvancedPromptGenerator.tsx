@@ -27,10 +27,10 @@ const AdvancedPromptGenerator: React.FC<AdvancedPromptGeneratorProps> = ({
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
 
   const generatePromptMutation = trpc.ai.generate.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setGeneratedPrompt(data.prompt);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error generating prompt:', error);
       Alert.alert('Error', 'Failed to generate prompt. Please try again.');
     },

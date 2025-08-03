@@ -7,7 +7,7 @@ const deletePromptSchema = z.object({
 
 export const deletePromptProcedure = protectedProcedure
   .input(deletePromptSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input }: { input: z.infer<typeof deletePromptSchema> }) => {
     // Mock delete - in a real app, this would delete from database
     console.log('Deleted prompt:', input.id);
     

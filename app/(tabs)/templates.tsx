@@ -28,11 +28,11 @@ export default function TemplatesScreen() {
   });
 
   const allTemplates = templatesQuery.data?.templates || templates;
-  const filteredTemplates = allTemplates.filter(template => {
+  const filteredTemplates = allTemplates.filter((template: PromptTemplate) => {
     const matchesSearch = searchQuery === '' || 
       template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      template.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesCategory = selectedCategory === null || template.category === selectedCategory;
     

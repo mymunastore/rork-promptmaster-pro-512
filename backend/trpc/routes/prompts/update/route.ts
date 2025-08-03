@@ -13,7 +13,7 @@ const updatePromptSchema = z.object({
 
 export const updatePromptProcedure = protectedProcedure
   .input(updatePromptSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input }: { input: z.infer<typeof updatePromptSchema> }) => {
     const { id, ...updates } = input;
     
     // Mock update - in a real app, this would update the database
