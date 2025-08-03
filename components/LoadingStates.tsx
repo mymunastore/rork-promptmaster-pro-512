@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions, DimensionValue } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles, Brain, Zap } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
@@ -87,7 +87,7 @@ export function FullScreenLoading({ message = 'Loading...', variant = 'default' 
 }
 
 interface SkeletonProps {
-  width?: number | string;
+  width?: DimensionValue;
   height?: number;
   borderRadius?: number;
   style?: any;
