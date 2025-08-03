@@ -170,7 +170,7 @@ export default function SavedPromptsScreen() {
               Showing {stats.filteredPrompts} of {stats.totalPrompts} prompts
               {stats.filterEfficiency < 100 && (
                 <Text style={styles.efficiencyText}>
-                  {' '}({stats.filterEfficiency.toFixed(0)}% match)
+                  {` (${stats.filterEfficiency.toFixed(0)}% match)`}
                 </Text>
               )}
             </Text>
