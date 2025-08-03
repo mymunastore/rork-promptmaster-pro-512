@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sparkles, BookOpen, Brain, Rocket, Zap, Star } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
@@ -9,13 +9,25 @@ import Card from '@/components/Card';
 import TemplateCard from '@/components/TemplateCard';
 import CategorySelector from '@/components/CategorySelector';
 import AnimatedBackground from '@/components/AnimatedBackground';
+import { ScrollableScreen } from '@/components/ScreenWrapper';
+import { useToast } from '@/components/Toast';
+import { usePerformanceMonitor, useInteractionTracking } from '@/hooks/usePerformanceMonitor';
 import { PromptCategory, PromptTemplate } from '@/types/prompt';
 import templates from '@/mocks/templates';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { showSuccess } = useToast();
+  const { trackOperation, trackNavigation } = usePerformanceMonitor('HomeScreen');
+  const { trackButtonPress, trackScreenView } = useInteractionTracking();
   const [selectedCategory, setSelectedCategory] = useState<PromptCategory | null>(null);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  // Track screen view
+  React.useEffect(() => {
+    trackScreenView('home');
+  }, [trackScreenView]);
 
   const filteredTemplates = selectedCategory 
     ? templates.filter(template => template.category === selectedCategory)
@@ -23,29 +35,61 @@ export default function HomeScreen() {
 
   const featuredTemplates = filteredTemplates.slice(0, 3);
 
-  const handleTemplatePress = (template: PromptTemplate) => {
+  const handleTemplatePress = useCallback((template: PromptTemplate) => {
+    const endTiming = trackNavigation('prompt-editor');
+    trackButtonPress('template-select', { templateId: template.id, category: template.category });
+    
     router.push({
       pathname: '/prompt/editor',
       params: { templateId: template.id }
     });
-  };
+    
+    endTiming();
+  }, [router, trackNavigation, trackButtonPress]);
 
-  const navigateToNewPrompt = () => {
+  const navigateToNewPrompt = useCallback(() => {
+    const endTiming = trackNavigation('new-prompt');
+    trackButtonPress('create-new-prompt');
+    
     router.push('/prompt/editor');
-  };
+    endTiming();
+  }, [router, trackNavigation, trackButtonPress]);
 
-  const navigateToTemplates = () => {
+  const navigateToTemplates = useCallback(() => {
+    const endTiming = trackNavigation('templates');
+    trackButtonPress('browse-templates');
+    
     router.push('/(tabs)/templates');
-  };
+    endTiming();
+  }, [router, trackNavigation, trackButtonPress]);
+
+  const handleRefresh = useCallback(async () => {
+    const endTiming = trackOperation('refresh-home');
+    setRefreshing(true);
+    
+    try {
+      // Simulate refresh operation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      showSuccess('Refreshed', 'Content has been updated');
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    } finally {
+      setRefreshing(false);
+      endTiming();
+    }
+  }, [trackOperation, showSuccess]);
+
+  const handleCategoryChange = useCallback((category: PromptCategory | null) => {
+    trackButtonPress('category-filter', { category });
+    setSelectedCategory(category);
+  }, [trackButtonPress]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: 'transparent',
     },
-    contentContainer: {
-      paddingBottom: layout.spacing.xxl,
-    },
+
     heroSection: {
       paddingTop: layout.spacing.xxl + layout.spacing.lg,
       paddingBottom: layout.spacing.xl,
@@ -206,11 +250,12 @@ export default function HomeScreen() {
 
   return (
     <AnimatedBackground variant="cosmic">
-      <ScrollView 
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
+      <ScrollableScreen
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
         testID="home-screen"
+        safeArea={false}
+        backgroundColor="transparent"
       >
         <View style={styles.heroSection}>
           <View style={styles.heroContent}>
@@ -295,7 +340,7 @@ export default function HomeScreen() {
           
           <CategorySelector 
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={handleCategoryChange}
             testID="category-selector"
           />
           
@@ -324,7 +369,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+      </ScrollableScreen>
     </AnimatedBackground>
   );
 }
