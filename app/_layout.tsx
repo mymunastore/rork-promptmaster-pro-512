@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PromptStoreProvider } from "@/hooks/usePromptStore";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { ApiKeysProvider } from "@/hooks/useApiKeys";
+import { trpc, trpcClient } from "@/lib/trpc";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,16 +32,18 @@ export default function RootLayout() {
   const GestureWrapper = Platform.OS === 'web' ? View : GestureHandlerRootView;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ApiKeysProvider>
-          <PromptStoreProvider>
-            <GestureWrapper style={{ flex: 1 }}>
-              <RootLayoutNav />
-            </GestureWrapper>
-          </PromptStoreProvider>
-        </ApiKeysProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <ApiKeysProvider>
+            <PromptStoreProvider>
+              <GestureWrapper style={{ flex: 1 }}>
+                <RootLayoutNav />
+              </GestureWrapper>
+            </PromptStoreProvider>
+          </ApiKeysProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </trpc.Provider>
   );
 }
