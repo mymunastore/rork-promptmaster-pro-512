@@ -219,7 +219,7 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.heroTitle}>AI Prompt Studio</Text>
             <Text style={styles.heroSubtitle}>
-              Create world-class AI prompts with professional templates, smart optimization, and advanced features ✨
+              Create world-class AI prompts with professional templates, smart optimization, and advanced features
             </Text>
             <View style={styles.heroButtons}>
               <Button 
@@ -319,7 +319,7 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.createNewText}>Create Custom Prompt</Text>
               <Text style={styles.createNewDescription}>
-                Start from scratch with your own prompt ✨
+                Start from scratch with your own prompt
               </Text>
             </TouchableOpacity>
           </View>
