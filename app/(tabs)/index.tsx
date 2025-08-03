@@ -1,7 +1,28 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Sparkles, BookOpen, Brain, Rocket, Zap, Star } from 'lucide-react-native';
+import { 
+  Sparkles, 
+  BookOpen, 
+  Brain, 
+  Rocket, 
+  Zap, 
+  Star, 
+  TrendingUp, 
+  Users, 
+  MessageCircle, 
+  Folder, 
+  BarChart3, 
+  Settings, 
+  Plus, 
+  Eye, 
+  Heart, 
+  Clock, 
+  Target,
+  Lightbulb,
+  Award,
+  Globe
+} from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import layout from '@/constants/layout';
 import Button from '@/components/Button';
@@ -13,7 +34,32 @@ import { ScrollableScreen } from '@/components/ScreenWrapper';
 import { useToast } from '@/components/Toast';
 import { usePerformanceMonitor, useInteractionTracking } from '@/hooks/usePerformanceMonitor';
 import { PromptCategory, PromptTemplate } from '@/types/prompt';
+import { usePromptStore } from '@/hooks/usePromptStore';
 import templates from '@/mocks/templates';
+import EnhancedPromptEditor from '@/components/EnhancedPromptEditor';
+import AIAssistant from '@/components/AIAssistant';
+import CollaborationHub from '@/components/CollaborationHub';
+import WorkspaceManager from '@/components/WorkspaceManager';
+import AdvancedAnalytics from '@/components/AdvancedAnalytics';
+
+interface QuickStat {
+  id: string;
+  title: string;
+  value: number;
+  change: string;
+  icon: any;
+  color: string;
+  trend: 'up' | 'down' | 'stable';
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'created' | 'edited' | 'shared' | 'collaborated';
+  title: string;
+  timestamp: string;
+  icon: any;
+  color: string;
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -21,13 +67,109 @@ export default function HomeScreen() {
   const { showSuccess } = useToast();
   const { trackOperation, trackNavigation } = usePerformanceMonitor('HomeScreen');
   const { trackButtonPress, trackScreenView } = useInteractionTracking();
+  const { savedPrompts } = usePromptStore();
   const [selectedCategory, setSelectedCategory] = useState<PromptCategory | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [showQuickActions, setShowQuickActions] = useState<boolean>(false);
+  const [activeModal, setActiveModal] = useState<'editor' | 'assistant' | 'collaboration' | 'workspace' | 'analytics' | null>(null);
+  const [quickStats, setQuickStats] = useState<QuickStat[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [greeting, setGreeting] = useState<string>('');
+  
+  const screenWidth = Dimensions.get('window').width;
 
-  // Track screen view
-  React.useEffect(() => {
+  // Track screen view and initialize data
+  useEffect(() => {
     trackScreenView('home');
+    initializeDashboard();
   }, [trackScreenView]);
+  
+  const initializeDashboard = useCallback(() => {
+    // Set greeting based on time
+    const hour = new Date().getHours();
+    let greetingText = 'Good morning';
+    if (hour >= 12 && hour < 17) greetingText = 'Good afternoon';
+    else if (hour >= 17) greetingText = 'Good evening';
+    setGreeting(greetingText);
+    
+    // Initialize quick stats
+    const stats: QuickStat[] = [
+      {
+        id: 'prompts',
+        title: 'Total Prompts',
+        value: savedPrompts.length,
+        change: '+12%',
+        icon: BookOpen,
+        color: theme.primary,
+        trend: 'up'
+      },
+      {
+        id: 'templates',
+        title: 'Templates Used',
+        value: 23,
+        change: '+8%',
+        icon: Star,
+        color: theme.accent1,
+        trend: 'up'
+      },
+      {
+        id: 'collaborations',
+        title: 'Collaborations',
+        value: 7,
+        change: '+15%',
+        icon: Users,
+        color: theme.accent2,
+        trend: 'up'
+      },
+      {
+        id: 'optimizations',
+        title: 'AI Optimizations',
+        value: 34,
+        change: '+23%',
+        icon: Zap,
+        color: theme.accent3,
+        trend: 'up'
+      }
+    ];
+    setQuickStats(stats);
+    
+    // Initialize recent activity
+    const activities: RecentActivity[] = [
+      {
+        id: '1',
+        type: 'created',
+        title: 'Marketing Campaign Prompt',
+        timestamp: '2 hours ago',
+        icon: Plus,
+        color: theme.success
+      },
+      {
+        id: '2',
+        type: 'collaborated',
+        title: 'Technical Documentation Template',
+        timestamp: '4 hours ago',
+        icon: Users,
+        color: theme.accent2
+      },
+      {
+        id: '3',
+        type: 'edited',
+        title: 'Creative Writing Prompt',
+        timestamp: '1 day ago',
+        icon: Brain,
+        color: theme.accent1
+      },
+      {
+        id: '4',
+        type: 'shared',
+        title: 'Business Strategy Template',
+        timestamp: '2 days ago',
+        icon: Globe,
+        color: theme.accent4
+      }
+    ];
+    setRecentActivity(activities);
+  }, [savedPrompts.length, theme]);
 
   const filteredTemplates = selectedCategory 
     ? templates.filter(template => template.category === selectedCategory)
@@ -51,9 +193,41 @@ export default function HomeScreen() {
     const endTiming = trackNavigation('new-prompt');
     trackButtonPress('create-new-prompt');
     
-    router.push('/prompt/editor');
+    setActiveModal('editor');
     endTiming();
-  }, [router, trackNavigation, trackButtonPress]);
+  }, [trackNavigation, trackButtonPress]);
+  
+  const openAIAssistant = useCallback(() => {
+    const endTiming = trackNavigation('ai-assistant');
+    trackButtonPress('open-ai-assistant');
+    
+    setActiveModal('assistant');
+    endTiming();
+  }, [trackNavigation, trackButtonPress]);
+  
+  const openCollaboration = useCallback(() => {
+    const endTiming = trackNavigation('collaboration');
+    trackButtonPress('open-collaboration');
+    
+    setActiveModal('collaboration');
+    endTiming();
+  }, [trackNavigation, trackButtonPress]);
+  
+  const openWorkspaces = useCallback(() => {
+    const endTiming = trackNavigation('workspaces');
+    trackButtonPress('open-workspaces');
+    
+    setActiveModal('workspace');
+    endTiming();
+  }, [trackNavigation, trackButtonPress]);
+  
+  const openAnalytics = useCallback(() => {
+    const endTiming = trackNavigation('analytics');
+    trackButtonPress('open-analytics');
+    
+    setActiveModal('analytics');
+    endTiming();
+  }, [trackNavigation, trackButtonPress]);
 
   const navigateToTemplates = useCallback(() => {
     const endTiming = trackNavigation('templates');
@@ -83,6 +257,17 @@ export default function HomeScreen() {
     trackButtonPress('category-filter', { category });
     setSelectedCategory(category);
   }, [trackButtonPress]);
+  
+  const handlePromptSave = useCallback((prompt: string, analytics: any) => {
+    console.log('Saving prompt:', prompt, analytics);
+    setActiveModal(null);
+    showSuccess('Prompt saved successfully!');
+  }, [showSuccess]);
+  
+  const handlePromptShare = useCallback((prompt: string) => {
+    console.log('Sharing prompt:', prompt);
+    showSuccess('Prompt shared!');
+  }, [showSuccess]);
 
   const styles = StyleSheet.create({
     container: {
@@ -91,10 +276,133 @@ export default function HomeScreen() {
     },
 
     heroSection: {
-      paddingTop: layout.spacing.xxl + layout.spacing.lg,
-      paddingBottom: layout.spacing.xl,
+      paddingTop: layout.spacing.xl,
+      paddingBottom: layout.spacing.lg,
       paddingHorizontal: layout.spacing.lg,
+    },
+    greetingContainer: {
+      marginBottom: layout.spacing.xl,
+    },
+    greetingText: {
+      fontSize: layout.typography.sizes.title1,
+      fontWeight: layout.typography.weights.bold,
+      color: theme.text,
+      marginBottom: layout.spacing.xs,
+    },
+    greetingSubtext: {
+      fontSize: layout.typography.sizes.body,
+      color: theme.textSecondary,
+      opacity: 0.8,
+    },
+    quickStatsContainer: {
+      marginBottom: layout.spacing.xl,
+    },
+    quickStatsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: layout.spacing.md,
+    },
+    quickStatCard: {
+      width: (screenWidth - layout.spacing.lg * 2 - layout.spacing.md) / 2,
+      padding: layout.spacing.lg,
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.xl,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    quickStatHeader: {
+      flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: layout.spacing.sm,
+    },
+    quickStatIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    quickStatValue: {
+      fontSize: layout.typography.sizes.title2,
+      fontWeight: layout.typography.weights.bold,
+      color: theme.text,
+      marginBottom: layout.spacing.xs,
+    },
+    quickStatTitle: {
+      fontSize: layout.typography.sizes.footnote,
+      color: theme.textSecondary,
+      marginBottom: layout.spacing.xs,
+    },
+    quickStatChange: {
+      fontSize: layout.typography.sizes.caption1,
+      fontWeight: layout.typography.weights.semibold,
+      color: theme.success,
+    },
+    quickActionsContainer: {
+      marginBottom: layout.spacing.xl,
+    },
+    quickActionsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: layout.spacing.sm,
+    },
+    quickActionCard: {
+      width: (screenWidth - layout.spacing.lg * 2 - layout.spacing.sm * 2) / 3,
+      aspectRatio: 1,
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.xl,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    quickActionIcon: {
+      marginBottom: layout.spacing.sm,
+    },
+    quickActionText: {
+      fontSize: layout.typography.sizes.caption1,
+      fontWeight: layout.typography.weights.medium,
+      color: theme.text,
+      textAlign: 'center',
+    },
+    recentActivityContainer: {
+      marginBottom: layout.spacing.xl,
+    },
+    activityItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: layout.spacing.md,
+      backgroundColor: theme.card,
+      borderRadius: layout.borderRadius.lg,
+      marginBottom: layout.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    activityIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: layout.spacing.md,
+    },
+    activityContent: {
+      flex: 1,
+    },
+    activityTitle: {
+      fontSize: layout.typography.sizes.subheadline,
+      fontWeight: layout.typography.weights.medium,
+      color: theme.text,
+      marginBottom: layout.spacing.xs,
+    },
+    activityTime: {
+      fontSize: layout.typography.sizes.caption1,
+      color: theme.textSecondary,
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: theme.background,
     },
     heroContent: {
       alignItems: 'center',
@@ -258,30 +566,98 @@ export default function HomeScreen() {
         backgroundColor="transparent"
       >
         <View style={styles.heroSection}>
-          <View style={styles.heroContent}>
-            <View style={styles.heroIconContainer}>
-              <Zap size={32} color={theme.primary} />
-            </View>
-            <Text style={styles.heroTitle}>AI Prompt Studio</Text>
-            <Text style={styles.heroSubtitle}>
-              Create world-class AI prompts with professional templates, smart optimization, and advanced features
+          <View style={styles.greetingContainer}>
+            <Text style={styles.greetingText}>{greeting}! 👋</Text>
+            <Text style={styles.greetingSubtext}>
+              Ready to create amazing prompts? Let&apos;s get started.
             </Text>
-            <View style={styles.heroButtons}>
-              <Button 
-                title="Start Creating" 
-                onPress={navigateToNewPrompt}
-                variant="primary"
-                style={styles.primaryButton}
-                testID="create-prompt-button"
-              />
-              <Button 
-                title="Browse Templates" 
-                onPress={navigateToTemplates}
-                variant="outline"
-                style={styles.secondaryButton}
-                testID="browse-templates-button"
-              />
+          </View>
+          
+          <View style={styles.quickStatsContainer}>
+            <Text style={styles.sectionTitle}>Quick Stats</Text>
+            <View style={styles.quickStatsGrid}>
+              {quickStats.map((stat) => {
+                const IconComponent = stat.icon;
+                return (
+                  <Card key={stat.id} style={styles.quickStatCard}>
+                    <View style={styles.quickStatHeader}>
+                      <View style={[styles.quickStatIcon, { backgroundColor: stat.color + '20' }]}>
+                        <IconComponent size={18} color={stat.color} />
+                      </View>
+                      <TrendingUp size={14} color={theme.success} />
+                    </View>
+                    <Text style={styles.quickStatValue}>{stat.value}</Text>
+                    <Text style={styles.quickStatTitle}>{stat.title}</Text>
+                    <Text style={styles.quickStatChange}>{stat.change}</Text>
+                  </Card>
+                );
+              })}
             </View>
+          </View>
+          
+          <View style={styles.quickActionsContainer}>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <View style={styles.quickActionsGrid}>
+              <TouchableOpacity style={styles.quickActionCard} onPress={navigateToNewPrompt}>
+                <View style={styles.quickActionIcon}>
+                  <Plus size={24} color={theme.primary} />
+                </View>
+                <Text style={styles.quickActionText}>New Prompt</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.quickActionCard} onPress={openAIAssistant}>
+                <View style={styles.quickActionIcon}>
+                  <MessageCircle size={24} color={theme.accent1} />
+                </View>
+                <Text style={styles.quickActionText}>AI Assistant</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.quickActionCard} onPress={navigateToTemplates}>
+                <View style={styles.quickActionIcon}>
+                  <BookOpen size={24} color={theme.accent2} />
+                </View>
+                <Text style={styles.quickActionText}>Templates</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.quickActionCard} onPress={openWorkspaces}>
+                <View style={styles.quickActionIcon}>
+                  <Folder size={24} color={theme.accent3} />
+                </View>
+                <Text style={styles.quickActionText}>Workspaces</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.quickActionCard} onPress={openCollaboration}>
+                <View style={styles.quickActionIcon}>
+                  <Users size={24} color={theme.accent4} />
+                </View>
+                <Text style={styles.quickActionText}>Collaborate</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.quickActionCard} onPress={openAnalytics}>
+                <View style={styles.quickActionIcon}>
+                  <BarChart3 size={24} color={theme.success} />
+                </View>
+                <Text style={styles.quickActionText}>Analytics</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          <View style={styles.recentActivityContainer}>
+            <Text style={styles.sectionTitle}>Recent Activity</Text>
+            {recentActivity.map((activity) => {
+              const IconComponent = activity.icon;
+              return (
+                <View key={activity.id} style={styles.activityItem}>
+                  <View style={[styles.activityIcon, { backgroundColor: activity.color + '20' }]}>
+                    <IconComponent size={18} color={activity.color} />
+                  </View>
+                  <View style={styles.activityContent}>
+                    <Text style={styles.activityTitle}>{activity.title}</Text>
+                    <Text style={styles.activityTime}>{activity.timestamp}</Text>
+                  </View>
+                </View>
+              );
+            })}
           </View>
         </View>
 
@@ -370,6 +746,82 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollableScreen>
+      
+      {/* Enhanced Prompt Editor Modal */}
+      <Modal
+        visible={activeModal === 'editor'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setActiveModal(null)}
+      >
+        <View style={styles.modalContainer}>
+          <EnhancedPromptEditor
+            onSave={(prompt, analytics) => {
+              console.log('Prompt saved:', prompt, analytics);
+              setActiveModal(null);
+              showSuccess('Prompt saved successfully!');
+            }}
+            onShare={(prompt) => {
+              console.log('Prompt shared:', prompt);
+              showSuccess('Prompt shared!');
+            }}
+          />
+        </View>
+      </Modal>
+      
+      {/* AI Assistant Modal */}
+      <Modal
+        visible={activeModal === 'assistant'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setActiveModal(null)}
+      >
+        <View style={styles.modalContainer}>
+          <AIAssistant
+            onPromptSuggestion={(prompt) => {
+              console.log('AI suggested prompt:', prompt);
+              setActiveModal('editor');
+            }}
+            category={selectedCategory || 'writing'}
+          />
+        </View>
+      </Modal>
+      
+      {/* Collaboration Hub Modal */}
+      <Modal
+        visible={activeModal === 'collaboration'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setActiveModal(null)}
+      >
+        <View style={styles.modalContainer}>
+          <CollaborationHub />
+        </View>
+      </Modal>
+      
+      {/* Workspace Manager Modal */}
+      <Modal
+        visible={activeModal === 'workspace'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setActiveModal(null)}
+      >
+        <View style={styles.modalContainer}>
+          <WorkspaceManager />
+        </View>
+      </Modal>
+      
+      {/* Advanced Analytics Modal */}
+      <Modal
+        visible={activeModal === 'analytics'}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setActiveModal(null)}
+      >
+        <View style={styles.modalContainer}>
+          <AdvancedAnalytics />
+        </View>
+      </Modal>
     </AnimatedBackground>
   );
 }
