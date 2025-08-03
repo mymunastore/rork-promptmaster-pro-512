@@ -32,6 +32,23 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(-100));
 
+  const handleDismiss = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -100,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onDismiss(toast.id);
+    });
+  }, [fadeAnim, slideAnim, toast.id, onDismiss]);
+
   useEffect(() => {
     // Animate in
     Animated.parallel([
@@ -55,24 +72,9 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
 
       return () => clearTimeout(timer);
     }
-  }, [toast.duration, toast.persistent, handleDismiss]);
+  }, [toast.duration, toast.persistent, handleDismiss, fadeAnim, slideAnim]);
 
-  const handleDismiss = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: -100,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onDismiss(toast.id);
-    });
-  }, [fadeAnim, slideAnim, toast.id, onDismiss]);
+
 
   const getIcon = () => {
     const iconSize = 20;

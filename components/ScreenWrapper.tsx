@@ -91,7 +91,9 @@ export default function ScreenWrapper({
               {/* Error will be handled by ErrorBoundary */}
             </View>
           }
-        />
+        >
+          <View />
+        </ErrorBoundary>
       );
     }
 

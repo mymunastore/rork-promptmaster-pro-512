@@ -102,7 +102,7 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 8, style 
       height,
       borderRadius,
       overflow: 'hidden',
-      backgroundColor: theme.surface,
+      backgroundColor: theme.card,
     },
     gradient: {
       flex: 1,
@@ -113,9 +113,9 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 8, style 
     <View style={[styles.skeleton, style]}>
       <LinearGradient
         colors={[
-          theme.surface,
-          theme.surface + '80',
-          theme.surface,
+          theme.card,
+          theme.card + '80',
+          theme.card,
         ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -249,7 +249,7 @@ export function LoadingOverlay({ visible, message = 'Processing...', variant = '
       zIndex: 1000,
     },
     content: {
-      backgroundColor: theme.surface,
+      backgroundColor: theme.card,
       borderRadius: layout.borderRadius.xl,
       padding: layout.spacing.xl,
       alignItems: 'center',
