@@ -21,12 +21,15 @@ import layout from '@/constants/layout';
 import Card from '@/components/Card';
 import ApiKeyManager from '@/components/ApiKeyManager';
 import { usePromptStore } from '@/hooks/usePromptStore';
+import { useApiKeys } from '@/hooks/useApiKeys';
 import { useTheme } from '@/hooks/useTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
-  const { savedPrompts } = usePromptStore();
+  const { savedPrompts, syncEnabled, toggleSync } = usePromptStore();
+  const { clearAllApiKeys } = useApiKeys();
   const { theme, themeMode, isDark, toggleTheme, isLoading: themeLoading } = useTheme();
+  const [showApiKeys, setShowApiKeys] = useState<boolean>(false);
   
   // Settings state
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
@@ -476,8 +479,58 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Sync & Backup</Text>
+        <Card style={styles.card}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.settingItemPressed
+            ]}
+            onPress={() => toggleSync(!syncEnabled)}
+            testID="toggle-sync-button"
+          >
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.primary}15` }]}>
+              <Settings size={20} color={theme.primary} />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>Cloud Sync</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                {syncEnabled ? 'Syncing with server' : 'Local storage only'}
+              </Text>
+            </View>
+            <Switch
+              trackColor={{ false: theme.border, true: theme.primaryLight }}
+              thumbColor={syncEnabled ? theme.primary : theme.card}
+              ios_backgroundColor={theme.border}
+              value={syncEnabled}
+              onValueChange={() => toggleSync(!syncEnabled)}
+              testID="sync-switch"
+            />
+          </Pressable>
+        </Card>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>AI Configuration</Text>
-        <ApiKeyManager testID="api-key-manager" />
+        <Card style={styles.card}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.settingItemPressed
+            ]}
+            onPress={() => setShowApiKeys(!showApiKeys)}
+            testID="api-keys-setting"
+          >
+            <View style={[styles.settingIconContainer, { backgroundColor: `${theme.accent2}15` }]}>
+              <Settings size={20} color={theme.accent2} />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.text }]}>API Keys</Text>
+              <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>Configure your AI service API keys</Text>
+            </View>
+            <ChevronRight size={20} color={theme.textSecondary} />
+          </Pressable>
+        </Card>
       </View>
 
       <View style={styles.section}>

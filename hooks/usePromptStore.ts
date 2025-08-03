@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 import { SavedPrompt, PromptCategory } from '@/types/prompt';
+import { trpc } from '@/lib/trpc';
 
 // Storage keys
 const SAVED_PROMPTS_KEY = 'ai_prompt_generator_saved_prompts';
+const SYNC_STATUS_KEY = 'ai_prompt_generator_sync_status';
 
 // Generate a unique ID
 const generateId = (): string => {
@@ -16,6 +18,8 @@ const generateId = (): string => {
 export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
   const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [syncEnabled, setSyncEnabled] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
   // Query to fetch saved prompts from AsyncStorage
   const savedPromptsQuery = useQuery({
@@ -32,7 +36,13 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
     },
   });
 
-  // Mutation to save prompts to AsyncStorage
+  // tRPC queries for server sync
+  const serverPromptsQuery = trpc.prompts.list.useQuery(
+    { limit: 100 },
+    { enabled: syncEnabled }
+  );
+
+  // Mutations
   const savePromptsMutation = useMutation({
     mutationFn: async (prompts: SavedPrompt[]) => {
       try {
@@ -46,6 +56,24 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
     },
   });
 
+  const createPromptMutation = trpc.prompts.create.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
+    },
+  });
+
+  const updatePromptMutation = trpc.prompts.update.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
+    },
+  });
+
+  const deletePromptMutation = trpc.prompts.delete.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
+    },
+  });
+
   // Initialize prompts from query
   useEffect(() => {
     if (savedPromptsQuery.data && !isInitialized) {
@@ -54,8 +82,28 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
     }
   }, [savedPromptsQuery.data, isInitialized]);
 
+  // Sync with server when enabled
+  useEffect(() => {
+    if (syncEnabled && serverPromptsQuery.data) {
+      // Merge server prompts with local prompts
+      const serverPrompts = serverPromptsQuery.data.prompts.map(p => ({
+        id: p.id,
+        title: p.title,
+        content: p.content,
+        category: p.category,
+        tags: p.tags,
+        isFavorite: p.isFavorite,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      }));
+      
+      // Simple merge strategy - server takes precedence
+      setSavedPrompts(serverPrompts);
+    }
+  }, [syncEnabled, serverPromptsQuery.data]);
+
   // Save a new prompt
-  const savePrompt = (prompt: Omit<SavedPrompt, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const savePrompt = async (prompt: Omit<SavedPrompt, 'id' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     const newPrompt: SavedPrompt = {
       ...prompt,
@@ -67,11 +115,27 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
     const updatedPrompts = [...savedPrompts, newPrompt];
     setSavedPrompts(updatedPrompts);
     savePromptsMutation.mutate(updatedPrompts);
+
+    // Sync to server if enabled
+    if (syncEnabled) {
+      try {
+        await createPromptMutation.mutateAsync({
+          title: newPrompt.title,
+          content: newPrompt.content,
+          category: newPrompt.category,
+          tags: newPrompt.tags,
+          isFavorite: newPrompt.isFavorite,
+        });
+      } catch (error) {
+        console.error('Failed to sync prompt to server:', error);
+      }
+    }
+
     return newPrompt;
   };
 
   // Update an existing prompt
-  const updatePrompt = (id: string, updates: Partial<Omit<SavedPrompt, 'id' | 'createdAt'>>) => {
+  const updatePrompt = async (id: string, updates: Partial<Omit<SavedPrompt, 'id' | 'createdAt'>>) => {
     const updatedPrompts = savedPrompts.map(prompt => {
       if (prompt.id === id) {
         return {
@@ -85,13 +149,31 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
 
     setSavedPrompts(updatedPrompts);
     savePromptsMutation.mutate(updatedPrompts);
+
+    // Sync to server if enabled
+    if (syncEnabled) {
+      try {
+        await updatePromptMutation.mutateAsync({ id, ...updates });
+      } catch (error) {
+        console.error('Failed to sync prompt update to server:', error);
+      }
+    }
   };
 
   // Delete a prompt
-  const deletePrompt = (id: string) => {
+  const deletePrompt = async (id: string) => {
     const updatedPrompts = savedPrompts.filter(prompt => prompt.id !== id);
     setSavedPrompts(updatedPrompts);
     savePromptsMutation.mutate(updatedPrompts);
+
+    // Sync to server if enabled
+    if (syncEnabled) {
+      try {
+        await deletePromptMutation.mutateAsync({ id });
+      } catch (error) {
+        console.error('Failed to sync prompt deletion to server:', error);
+      }
+    }
   };
 
   // Toggle favorite status
@@ -109,6 +191,17 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
 
     setSavedPrompts(updatedPrompts);
     savePromptsMutation.mutate(updatedPrompts);
+
+    // Sync to server if enabled
+    if (syncEnabled) {
+      const prompt = savedPrompts.find(p => p.id === id);
+      if (prompt) {
+        updatePromptMutation.mutate({ 
+          id, 
+          isFavorite: !prompt.isFavorite 
+        });
+      }
+    }
   };
 
   // Get a prompt by ID
@@ -116,15 +209,40 @@ export const [PromptStoreProvider, usePromptStore] = createContextHook(() => {
     return savedPrompts.find(prompt => prompt.id === id);
   };
 
+  // Enable/disable server sync
+  const toggleSync = async (enabled: boolean) => {
+    setSyncEnabled(enabled);
+    await AsyncStorage.setItem(SYNC_STATUS_KEY, JSON.stringify(enabled));
+  };
+
+  // Load sync status
+  useEffect(() => {
+    const loadSyncStatus = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(SYNC_STATUS_KEY);
+        if (stored) {
+          setSyncEnabled(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Error loading sync status:', error);
+      }
+    };
+    loadSyncStatus();
+  }, []);
+
   return {
     savedPrompts,
-    isLoading: savedPromptsQuery.isLoading,
-    error: savedPromptsQuery.error,
+    isLoading: savedPromptsQuery.isLoading || (syncEnabled && serverPromptsQuery.isLoading),
+    error: savedPromptsQuery.error || serverPromptsQuery.error,
+    syncEnabled,
     savePrompt,
     updatePrompt,
     deletePrompt,
     toggleFavorite,
     getPromptById,
+    toggleSync,
+    // Server sync status
+    isSyncing: createPromptMutation.isPending || updatePromptMutation.isPending || deletePromptMutation.isPending,
   };
 });
 

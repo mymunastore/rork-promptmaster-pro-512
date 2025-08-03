@@ -28,6 +28,9 @@ import PromptAnalytics from '@/components/PromptAnalytics';
 import PromptRewriter from '@/components/PromptRewriter';
 import PromptABTesting from '@/components/PromptABTesting';
 import PromptChatCompanion from '@/components/PromptChatCompanion';
+import AdvancedPromptGenerator from '@/components/AdvancedPromptGenerator';
+import PromptOptimizer from '@/components/PromptOptimizer';
+import AdvancedAnalytics from '@/components/AdvancedAnalytics';
 import { PromptCategory, TopicSuggestion } from '@/types/prompt';
 import { usePromptStore } from '@/hooks/usePromptStore';
 import templates from '@/mocks/templates';
@@ -50,6 +53,9 @@ export default function PromptEditorScreen() {
   const [showRewriter, setShowRewriter] = useState<boolean>(false);
   const [showABTesting, setShowABTesting] = useState<boolean>(false);
   const [showChatCompanion, setShowChatCompanion] = useState<boolean>(false);
+  const [showAdvancedGenerator, setShowAdvancedGenerator] = useState<boolean>(false);
+  const [showOptimizer, setShowOptimizer] = useState<boolean>(false);
+  const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState<boolean>(false);
   const [promptB, setPromptB] = useState<string>('');
 
   // Initialize from template or saved prompt
@@ -171,6 +177,14 @@ export default function PromptEditorScreen() {
 
   const handleChatSuggestion = (suggestion: string) => {
     setContent(suggestion);
+  };
+
+  const handleGeneratedPrompt = (generatedPrompt: string) => {
+    setContent(generatedPrompt);
+  };
+
+  const handleOptimizedPrompt = (optimizedPrompt: string) => {
+    setContent(optimizedPrompt);
   };
 
   const renderCategoryButton = (categoryId: PromptCategory, label: string) => (
@@ -577,6 +591,71 @@ export default function PromptEditorScreen() {
                 onTestComplete={handleABTestComplete}
                 testID="prompt-ab-testing"
               />
+            </View>
+          )}
+        </View>
+
+        {/* Advanced Prompt Generator Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowAdvancedGenerator(!showAdvancedGenerator)}
+            testID="toggle-advanced-generator-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showAdvancedGenerator ? 'Hide AI Generator' : 'Show AI Generator'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showAdvancedGenerator && (
+            <View style={{ height: 500 }}>
+              <AdvancedPromptGenerator 
+                onPromptGenerated={handleGeneratedPrompt}
+                testID="advanced-prompt-generator"
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Prompt Optimizer Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowOptimizer(!showOptimizer)}
+            testID="toggle-optimizer-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showOptimizer ? 'Hide Optimizer' : 'Show Optimizer'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showOptimizer && (
+            <View style={{ height: 600 }}>
+              <PromptOptimizer 
+                prompt={content}
+                category={category}
+                onOptimizedPrompt={handleOptimizedPrompt}
+                testID="prompt-optimizer"
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Advanced Analytics Section */}
+        <View style={styles.section}>
+          <TouchableOpacity 
+            style={styles.suggestionsHeader}
+            onPress={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
+            testID="toggle-advanced-analytics-button"
+          >
+            <Text style={styles.suggestionsTitle}>
+              {showAdvancedAnalytics ? 'Hide Advanced Analytics' : 'Show Advanced Analytics'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showAdvancedAnalytics && (
+            <View style={{ height: 500 }}>
+              <AdvancedAnalytics testID="advanced-analytics" />
             </View>
           )}
         </View>

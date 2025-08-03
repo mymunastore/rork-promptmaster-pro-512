@@ -14,9 +14,58 @@ export interface SavedPrompt {
   content: string;
   category: PromptCategory;
   tags: string[];
+  isFavorite: boolean;
+  isPublic?: boolean;
   createdAt: string;
   updatedAt: string;
-  isFavorite: boolean;
+  userId?: string;
+  analytics?: {
+    views: number;
+    uses: number;
+    shares: number;
+    rating: number;
+    ratingCount: number;
+  };
+}
+
+export interface PromptAnalytics {
+  metrics: {
+    wordCount: number;
+    charCount: number;
+    sentenceCount: number;
+    avgWordsPerSentence: number;
+    readabilityScore: number;
+  };
+  scores: {
+    overall: number;
+    clarity: number;
+    specificity: number;
+    creativity: number;
+    complexity: string;
+  };
+  keywords: string[];
+  sentiment: 'positive' | 'negative' | 'neutral';
+  suggestions: string[];
+  categoryMatch: PromptCategory;
+  estimatedTokens: number;
+}
+
+export interface OptimizationResult {
+  originalPrompt: string;
+  optimizedPrompt: string;
+  optimizationType: 'clarity' | 'specificity' | 'creativity' | 'performance';
+  improvements: string[];
+  score: number;
+}
+
+export interface GeneratedPrompt {
+  prompt: string;
+  category: PromptCategory;
+  purpose: string;
+  tone: 'professional' | 'casual' | 'creative' | 'technical' | 'friendly';
+  length: 'short' | 'medium' | 'long';
+  keywords: string[];
+  generatedAt: string;
 }
 
 export type PromptCategory = 
