@@ -182,7 +182,7 @@ const EnhancedPromptEditor: React.FC<EnhancedPromptEditorProps> = ({
   
   // Writing timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (timerActive) {
       interval = setInterval(() => {
         setWritingTimer(prev => prev + 1);
